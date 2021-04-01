@@ -78,8 +78,8 @@ class DeprecatedKeywords(SessionKeywords):
             uri,
             params=params,
             headers=headers,
-            data=data,
-            json=json,
+            # data=data,
+            # json=json,
             allow_redirects=redir,
             timeout=timeout)
 

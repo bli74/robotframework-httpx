@@ -1,3 +1,4 @@
+import copy
 import sys
 import logging
 import pprint
@@ -573,11 +574,7 @@ class SessionKeywords(HttpxKeywords):
 
         resp = method_function(
             self._get_url(session, uri),
-            params=utils.utf8_urlencode(kwargs.pop('params', None)),
-            timeout=self._get_timeout(kwargs.pop('timeout', None)),
-            cookies=kwargs.pop('cookies', self.cookies)) #,
-            #**kwargs)
-
+            **kwargs)
 
         log.log_request(resp)
         self._print_debug()
