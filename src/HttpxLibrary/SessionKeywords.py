@@ -1,29 +1,31 @@
 import sys
 import logging
+import pprint
 
-import requests
-from requests.cookies import merge_cookies
-from requests.sessions import merge_setting
-from requests.models import Response
+import httpx
+#from httpx.cookies import merge_cookies
+#from httpx.sessions import merge_setting
+from httpx._models import Response
 
 from robot.api import logger
 from robot.api.deco import keyword
 from robot.utils.asserts import assert_equal
 
-from RequestsLibrary import utils, log
-from RequestsLibrary.compat import httplib, PY3, RetryAdapter
-from .RequestsKeywords import RequestsKeywords
-from RequestsLibrary.exceptions import InvalidResponse, InvalidExpectedStatus
-from RequestsLibrary.utils import is_file_descriptor, is_string_type
+from HttpxLibrary import utils, log
+from HttpxLibrary.compat import httplib, PY3
+#, RetryAdapter
+from .HttpxKeywords import HttpxKeywords
+from HttpxLibrary.exceptions import InvalidResponse, InvalidExpectedStatus
+from HttpxLibrary.utils import is_file_descriptor, is_string_type
 
 try:
-    from requests_ntlm import HttpNtlmAuth
+    from httpx_ntlm import HttpNtlmAuth
 except ImportError:
     pass
 
 
-class SessionKeywords(RequestsKeywords):
-    DEFAULT_RETRY_METHOD_LIST = RetryAdapter.get_default_allowed_methods()
+class SessionKeywords(HttpxKeywords):
+#    DEFAULT_RETRY_METHOD_LIST = RetryAdapter.get_default_allowed_methods()
 
     def _create_session(
             self,
@@ -33,38 +35,38 @@ class SessionKeywords(RequestsKeywords):
             cookies,
             auth,
             timeout,
-            proxies,
+#            proxies,
             verify,
             debug,
             max_retries,
             backoff_factor,
-            disable_warnings,
-            retry_status_list,
-            retry_method_list):
+            disable_warnings):
+            #retry_status_list,
+            #retry_method_list):
 
         logger.debug('Creating session: %s' % alias)
-        s = session = requests.Session()
+        s = session = httpx.Client()
         s.headers.update(headers)
         s.auth = auth if auth else s.auth
-        s.proxies = proxies if proxies else s.proxies
+        #s.proxies = proxies if proxies else s.proxies
 
         try:
             max_retries = int(max_retries)
-            retry_status_list = [int(x) for x in retry_status_list] if retry_status_list else None
+            #retry_status_list = [int(x) for x in retry_status_list] if retry_status_list else None
         except ValueError as err:
             raise ValueError("Error converting session parameter: %s" % err)
 
-        if max_retries > 0:
-            retry = RetryAdapter(total=max_retries,
-                                 backoff_factor=backoff_factor,
-                                 status_forcelist=retry_status_list,
-                                 allowed_methods=retry_method_list)
-            http = requests.adapters.HTTPAdapter(max_retries=retry)
-            https = requests.adapters.HTTPAdapter(max_retries=retry)
+        #if max_retries > 0:
+        #    retry = RetryAdapter(total=max_retries,
+        #                         backoff_factor=backoff_factor,
+        #                         status_forcelist=retry_status_list,
+        #                         allowed_methods=retry_method_list)
+        #    http = httpx.adapters.HTTPAdapter(max_retries=retry)
+        #    https = httpx.adapters.HTTPAdapter(max_retries=retry)
 
             # Replace the session's original adapters
-            s.mount('http://', http)
-            s.mount('https://', https)
+        #    s.mount('http://', http)
+        #    s.mount('https://', https)
 
         # Disable requests warnings, useful when you have large number of testcase
         # you will observe drastical changes in Robot log.html and output.xml files size
@@ -72,11 +74,11 @@ class SessionKeywords(RequestsKeywords):
             # you need to initialize logging, otherwise you will not see anything from requests
             logging.basicConfig()
             logging.getLogger().setLevel(logging.ERROR)
-            requests_log = logging.getLogger("requests")
-            requests_log.setLevel(logging.ERROR)
-            requests_log.propagate = True
+            httpx_log = logging.getLogger("httpx")
+            httpx_log.setLevel(logging.ERROR)
+            httpx_log.propagate = True
             if not verify:
-                requests.packages.urllib3.disable_warnings()
+                httpx.packages.urllib3.disable_warnings()
 
         # verify can be a Boolean or a String
         if isinstance(verify, bool):
@@ -113,14 +115,14 @@ class SessionKeywords(RequestsKeywords):
                        cookies={},
                        auth=None,
                        timeout=None,
-                       proxies=None,
+#                       proxies=None,
                        verify=False,
                        debug=0,
                        max_retries=3,
                        backoff_factor=0.10,
-                       disable_warnings=0,
-                       retry_status_list=[],
-                       retry_method_list=DEFAULT_RETRY_METHOD_LIST):
+                       disable_warnings=0):
+                       #retry_status_list=[],
+                       #retry_method_list=DEFAULT_RETRY_METHOD_LIST):
         """ Create Session: create a HTTP session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -147,7 +149,7 @@ class SessionKeywords(RequestsKeywords):
                         A 0 value will disable any kind of retries regardless of other retry settings.
                         In case the number of retries is reached a retry exception is raised.
 
-        ``disable_warnings`` Disable requests warning useful when you have large number of testcases
+        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
 
         ``backoff_factor`` Introduces a delay time between retries that is longer after each retry.
                            eg. if backoff_factor is set to 0.1
@@ -164,12 +166,12 @@ class SessionKeywords(RequestsKeywords):
                               Note that max_retries must be greater than 0.
 
         """
-        auth = requests.auth.HTTPBasicAuth(*auth) if auth else None
+        auth = httpx.auth.BasicAuth(*auth) if auth else None
 
         logger.info('Creating Session using : alias=%s, url=%s, headers=%s, \
-                    cookies=%s, auth=%s, timeout=%s, proxies=%s, verify=%s, \
+                    cookies=%s, auth=%s, timeout=%s,  verify=%s, \
                     debug=%s ' % (alias, url, headers, cookies, auth, timeout,
-                                  proxies, verify, debug))
+                                  verify, debug))
         return self._create_session(
             alias=alias,
             url=url,
@@ -179,12 +181,12 @@ class SessionKeywords(RequestsKeywords):
             timeout=timeout,
             max_retries=max_retries,
             backoff_factor=backoff_factor,
-            proxies=proxies,
+#            proxies=proxies,
             verify=verify,
             debug=debug,
-            disable_warnings=disable_warnings,
-            retry_status_list=retry_status_list,
-            retry_method_list=retry_method_list)
+            disable_warnings=disable_warnings)
+            #retry_status_list=retry_status_list,
+            #retry_method_list=retry_method_list)
 
     @keyword("Create Client Cert Session")
     def create_client_cert_session(
@@ -195,14 +197,14 @@ class SessionKeywords(RequestsKeywords):
             cookies={},
             client_certs=None,
             timeout=None,
-            proxies=None,
+#            proxies=None,
             verify=False,
             debug=0,
             max_retries=3,
             backoff_factor=0.10,
-            disable_warnings=0,
-            retry_status_list=[],
-            retry_method_list=DEFAULT_RETRY_METHOD_LIST):
+            disable_warnings=0):
+            #retry_status_list=[],
+            #retry_method_list=DEFAULT_RETRY_METHOD_LIST):
         """ Create Session: create a HTTP session to a server
 
         ``url`` Base url of the server
@@ -248,9 +250,9 @@ class SessionKeywords(RequestsKeywords):
         """
 
         logger.info('Creating Session using : alias=%s, url=%s, headers=%s, \
-                    cookies=%s, client_certs=%s, timeout=%s, proxies=%s, verify=%s, \
+                    cookies=%s, client_certs=%s, timeout=%s, verify=%s, \
                     debug=%s ' % (alias, url, headers, cookies, client_certs, timeout,
-                                  proxies, verify, debug))
+                                  verify, debug))
 
         session = self._create_session(
             alias=alias,
@@ -261,12 +263,12 @@ class SessionKeywords(RequestsKeywords):
             timeout=timeout,
             max_retries=max_retries,
             backoff_factor=backoff_factor,
-            proxies=proxies,
+#            proxies=proxies,
             verify=verify,
             debug=debug,
-            disable_warnings=disable_warnings,
-            retry_status_list=retry_status_list,
-            retry_method_list=retry_method_list)
+            disable_warnings=disable_warnings)
+            #retry_status_list=retry_status_list,
+            #retry_method_list=retry_method_list)
 
         session.cert = tuple(client_certs)
         return session
@@ -280,14 +282,14 @@ class SessionKeywords(RequestsKeywords):
             headers={},
             cookies={},
             timeout=None,
-            proxies=None,
+#            proxies=None,
             verify=False,
             debug=0,
             max_retries=3,
             backoff_factor=0.10,
-            disable_warnings=0,
-            retry_status_list=[],
-            retry_method_list=DEFAULT_RETRY_METHOD_LIST):
+            disable_warnings=0):
+            #retry_status_list=[],
+            #retry_method_list=DEFAULT_RETRY_METHOD_LIST):
         """ Create Session: create a HTTP session to a server
 
         ``url`` Base url of the server
@@ -334,9 +336,9 @@ class SessionKeywords(RequestsKeywords):
         """
 
         logger.info('Creating Custom Authenticated Session using : alias=%s, url=%s, headers=%s, \
-                    cookies=%s, auth=%s, timeout=%s, proxies=%s, verify=%s, \
+                    cookies=%s, auth=%s, timeout=%s, verify=%s, \
                     debug=%s ' % (alias, url, headers, cookies, auth, timeout,
-                                  proxies, verify, debug))
+                                  verify, debug))
 
         return self._create_session(
             alias=alias,
@@ -347,12 +349,12 @@ class SessionKeywords(RequestsKeywords):
             timeout=timeout,
             max_retries=max_retries,
             backoff_factor=backoff_factor,
-            proxies=proxies,
+#            proxies=proxies,
             verify=verify,
             debug=debug,
-            disable_warnings=disable_warnings,
-            retry_status_list=retry_status_list,
-            retry_method_list=retry_method_list)
+            disable_warnings=disable_warnings)
+            #retry_status_list=retry_status_list,
+            #retry_method_list=retry_method_list)
 
     @keyword("Create Digest Session")
     def create_digest_session(
@@ -363,13 +365,13 @@ class SessionKeywords(RequestsKeywords):
             headers={},
             cookies={},
             timeout=None,
-            proxies=None, verify=False,
+#            proxies=None, verify=False,
             debug=0,
             max_retries=3,
             backoff_factor=0.10,
-            disable_warnings=0,
-            retry_status_list=[],
-            retry_method_list=DEFAULT_RETRY_METHOD_LIST):
+            disable_warnings=0):
+            #retry_status_list=[],
+            #retry_method_list=DEFAULT_RETRY_METHOD_LIST):
         """ Create Session: create a HTTP session to a server
 
         ``url`` Base url of the server
@@ -413,7 +415,7 @@ class SessionKeywords(RequestsKeywords):
                               eg. set to [502, 503] to retry requests if those status are returned.
                               Note that max_retries must be greater than 0.
         """
-        digest_auth = requests.auth.HTTPDigestAuth(*auth) if auth else None
+        digest_auth = httpx.auth.DigestAuth(*auth) if auth else None
 
         return self._create_session(
             alias=alias,
@@ -424,12 +426,12 @@ class SessionKeywords(RequestsKeywords):
             timeout=timeout,
             max_retries=max_retries,
             backoff_factor=backoff_factor,
-            proxies=proxies,
+#            proxies=proxies,
             verify=verify,
             debug=debug,
-            disable_warnings=disable_warnings,
-            retry_status_list=retry_status_list,
-            retry_method_list=retry_method_list)
+            disable_warnings=disable_warnings)
+            #retry_status_list=retry_status_list,
+            #retry_method_list=retry_method_list)
 
     @keyword("Create Ntlm Session")
     def create_ntlm_session(
@@ -440,14 +442,14 @@ class SessionKeywords(RequestsKeywords):
             headers={},
             cookies={},
             timeout=None,
-            proxies=None,
+#            proxies=None,
             verify=False,
             debug=0,
             max_retries=3,
             backoff_factor=0.10,
-            disable_warnings=0,
-            retry_status_list=[],
-            retry_method_list=DEFAULT_RETRY_METHOD_LIST):
+            disable_warnings=0):
+            #retry_status_list=[],
+            #retry_method_list=DEFAULT_RETRY_METHOD_LIST):
         """ Create Session: create a HTTP session to a server
 
         ``url`` Base url of the server
@@ -494,7 +496,7 @@ class SessionKeywords(RequestsKeywords):
         try:
             HttpNtlmAuth
         except NameError:
-            raise AssertionError('requests_ntlm module not installed')
+            raise AssertionError('httpx-ntlm module not installed')
         if len(auth) != 3:
             raise AssertionError('Incorrect number of authentication arguments'
                                  ' - expected 3, got {}'.format(len(auth)))
@@ -503,9 +505,9 @@ class SessionKeywords(RequestsKeywords):
                                      auth[2])
             logger.info('Creating NTLM Session using : alias=%s, url=%s, \
                         headers=%s, cookies=%s, ntlm_auth=%s, timeout=%s, \
-                        proxies=%s, verify=%s, debug=%s '
+                        verify=%s, debug=%s '
                         % (alias, url, headers, cookies, ntlm_auth,
-                           timeout, proxies, verify, debug))
+                           timeout, verify, debug))
 
             return self._create_session(
                 alias=alias,
@@ -516,12 +518,12 @@ class SessionKeywords(RequestsKeywords):
                 timeout=timeout,
                 max_retries=max_retries,
                 backoff_factor=backoff_factor,
-                proxies=proxies,
+#                proxies=proxies,
                 verify=verify,
                 debug=debug,
-                disable_warnings=disable_warnings,
-                retry_status_list=retry_status_list,
-                retry_method_list=retry_method_list)
+                disable_warnings=disable_warnings)
+                #retry_status_list=retry_status_list,
+                #retry_method_list=retry_method_list)
 
     @keyword("Session Exists")
     def session_exists(self, alias):
@@ -552,8 +554,8 @@ class SessionKeywords(RequestsKeywords):
         ``headers`` Dictionary of headers merge into session
         """
         session = self._cache.switch(alias)
-        session.headers = merge_setting(headers, session.headers)
-        session.cookies = merge_cookies(session.cookies, cookies)
+        #session.headers = merge_setting(headers, session.headers)
+        #session.cookies = merge_cookies(session.cookies, cookies)
 
     def _common_request(
             self,
@@ -563,23 +565,30 @@ class SessionKeywords(RequestsKeywords):
             **kwargs):
 
         method_function = getattr(session, method)
+        print("My info", session,method)
+        print(f" Kwargs: {kwargs}" )
         self._capture_output()
+
+        #if method = get atch the api in _api from httpx
 
         resp = method_function(
             self._get_url(session, uri),
             params=utils.utf8_urlencode(kwargs.pop('params', None)),
             timeout=self._get_timeout(kwargs.pop('timeout', None)),
-            cookies=kwargs.pop('cookies', self.cookies),
-            **kwargs)
+            cookies=kwargs.pop('cookies', self.cookies)) #,
+            #**kwargs)
+
 
         log.log_request(resp)
         self._print_debug()
         session.last_resp = resp
         log.log_response(resp)
 
-        data = kwargs.get('data', None)
-        if is_file_descriptor(data):
-            data.close()
+        #data = kwargs.get('data', None)
+        #epkcfsm remove this is request was a get
+        #if method is "get"
+        #   if is_file_descriptor(data):
+        #      data.close()
 
         return resp
 

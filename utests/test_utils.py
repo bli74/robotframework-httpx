@@ -1,10 +1,11 @@
 import os
 
 import pytest
-from requests import Session
+import httpx
+from httpx import _client
 
-from RequestsLibrary import RequestsLibrary
-from RequestsLibrary.utils import is_file_descriptor, merge_headers, warn_if_equal_symbol_in_url
+from HttpxLibrary import HttpxLibrary
+from HttpxLibrary.utils import is_file_descriptor, merge_headers, warn_if_equal_symbol_in_url
 from utests import SCRIPT_DIR
 from utests import mock
 
@@ -24,20 +25,20 @@ def test_is_file_descriptor():
 
 
 def test_merge_headers_with_session_headers_only():
-    session = Session()
+    session = httpx.Client()
     merged = merge_headers(session, None)
     assert merged == session.headers
 
 
 def test_merge_headers_with_all_none():
-    session = Session()
+    session = httpx.Client()
     session.headers = None
     merged = merge_headers(session, None)
     assert merged == {}
 
 
 def test_merge_headers_with_all():
-    session = Session()
+    session = httpx.Client()
     headers = {'Content-Type': 'test'}
     merged = merge_headers(session, headers)
     session.headers.update(headers)
@@ -46,26 +47,26 @@ def test_merge_headers_with_all():
 
 @pytest.fixture(scope='function')
 def mocked_keywords():
-    keywords = RequestsLibrary()
+    keywords = HttpxLibrary()
     keywords._cache = mock.MagicMock()
     keywords._common_request = mock.MagicMock()
     keywords._check_status = mock.MagicMock()
     return keywords
 
 
-@mock.patch('RequestsLibrary.utils.logger')
+@mock.patch('HttpxLibrary.utils.logger')
 def test_no_warn_if_url_passed_as_named(mocked_logger, mocked_keywords):
     mocked_keywords.get_on_session('alias', url='http://this.is.an.url')
     mocked_logger.warn.assert_not_called()
 
 
-@mock.patch('RequestsLibrary.utils.logger')
+@mock.patch('HttpxLibrary.utils.logger')
 def test_no_warn_if_url_passed_as_positional(mocked_logger, mocked_keywords):
     mocked_keywords.get_on_session('alias', 'http://this.is.an.url')
     mocked_logger.warn.assert_not_called()
 
 
-@mock.patch('RequestsLibrary.utils.logger')
+@mock.patch('HttpxLibrary.utils.logger')
 def test_warn_that_url_is_missing(mocked_logger, mocked_keywords):
     try:
         mocked_keywords.get_on_session(alias=None)

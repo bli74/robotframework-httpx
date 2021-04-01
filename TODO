@@ -1,0 +1,54 @@
+Background
+===========================================================
+This is a clone of Robot requests-library, that exposes keywords to access python request library
+python request library doesnt support http/2 and this is needed for the 5GC interfaces
+
+Httpx is a new python library that seems quite stable that implements http2 and uses a lot of more
+modern 3pp under the hood, httpx is not 100% API compatble with requests but API are very simillar
+
+INSTALL
+===========================================================
+pip3 install httpx[http2]
+
+TODO
+===========================================================
+
+Prio 1
+=============
+Fix the problem with **kwargs data the api.py file in httpx doesnt match the api.py in requests
+in requests the get function supports **kwargs including data file and json, these parameters are not
+allowed in httpx since they are ignored by an http server.
+
+Need a switch function of the http method and extract the parameters allowed from kwargs for a specific method
+then call that method with those parameters only an no kwarg.
+
+
+Prio 2
+============
+Look at implementing retry function in httpx library to give same function as available in the request python library
+
+Prio 3
+===========
+Get the startup of the flask http server working, possibly the retries will fix this
+
+Prio 4
+===========
+Cleanup all documentation and provide install instructions look at how to publish maybe on github 
+
+
+
+
+
+Issues
+=============================================================
+For some reason the webserver doesnt respond when started from robot
+I suspect its a timing issue, the original requests library robot and python exposes aretry mechanism
+This retry mechanism could be added inside the httpx robot library to maintain test case compliancy
+
+If the http flask server is started manually the atests passes 
+
+
+
+data is put in body of http request and there is no meaning of a body in a get request thats why httpx doesmt support this while requests does support sending body even it should be ignored by serevr according to standard, opened an discussion on this at httpx git. for now I will patch it out from the keyword library session  
+
+Since HTTPX doesnt have retries like Requests, maybe it would be possible to add retries inside the robot library instead

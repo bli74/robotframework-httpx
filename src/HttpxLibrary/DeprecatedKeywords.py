@@ -3,8 +3,8 @@ import json
 from robot.api import logger
 from robot.api.deco import keyword
 
-from RequestsLibrary import utils
-from RequestsLibrary.compat import PY3
+from HttpxLibrary import utils
+from HttpxLibrary.compat import PY3
 
 from .SessionKeywords import SessionKeywords
 

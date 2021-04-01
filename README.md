@@ -3,18 +3,17 @@
 [![PyPi downloads](https://img.shields.io/pypi/dm/robotframework-requests.svg)](https://pypi.python.org/pypi/robotframework-requests)
 [![Latest Version](https://img.shields.io/pypi/v/robotframework-requests.svg)](https://pypi.python.org/pypi/robotframework-requests)
 
-🏠 ``RequestsLibrary`` is a [Robot Framework](https://robotframework.org/) library
-aimed to provide HTTP api testing functionalities by wrapping the well known [Python Requests Library](https://github.com/kennethreitz/requests).
-
+🏠 ``HttpxLibrary`` is a [Robot Framework](https://robotframework.org/) library
+aimed to provide HTTP api testing functionalities by wrapping the well known [Python httpx Library](https://www.python-httpx.org/).
 
 ## Install stable version
 ```sh
-pip install robotframework-requests
+pip install robotframework-httpx
 ```
 
 ## ✨ Install latest 0.9 pre-release (alpha) version ✨
 ```sh
-pip install robotframework-requests --pre
+pip install robotframework-httpx --pre
 ```
 
 ### What's new in 0.9 pre-release
@@ -84,4 +83,3 @@ Feel free to contribute and open an issue in order to discuss it. Before doing i
 📢 Get in touch with the community via slack and Users group
 - [Robot Framework Slack #requests channel](https://robotframework-slack-invite.herokuapp.com/)
 - [Robot Framework Users Group](https://groups.google.com/forum/#!forum/robotframework-users)
-

@@ -1,6 +1,6 @@
 import logging
 
-from RequestsLibrary.utils import is_file_descriptor
+from HttpxLibrary.utils import is_file_descriptor
 from robot.api import logger
 
 
@@ -11,7 +11,7 @@ def log_response(response):
     logger.info("%s Response : url=%s \n " % (response.request.method.upper(),
                                               response.url) +
                 "status=%s, reason=%s \n " % (response.status_code,
-                                              response.reason) +
+                                              response.reason_phrase) +
                 "headers=%s \n " % response.headers +
                 "body=%s \n " % format_data_to_log_string(response.text))
 
@@ -26,9 +26,9 @@ def log_request(response):
         redirected = ''
     logger.info("%s Request : " % original_request.method.upper() +
                 "url=%s %s\n " % (original_request.url, redirected) +
-                "path_url=%s \n " % original_request.path_url +
-                "headers=%s \n " % original_request.headers +
-                "body=%s \n " % format_data_to_log_string(original_request.body))
+#                "path_url=%s \n " % original_request.path_url +
+                "headers=%s \n " % original_request.headers) 
+#                "body=%s \n " % format_data_to_log_string(original_request.body))
 
 
 def format_data_to_log_string(data, limit=LOG_CHAR_LIMIT):

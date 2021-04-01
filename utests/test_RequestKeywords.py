@@ -1,6 +1,6 @@
 import os
 
-from RequestsLibrary import RequestsLibrary
+from HttpxLibrary import HttpxLibrary
 from utests import mock
 
 from utests import SCRIPT_DIR
@@ -8,7 +8,7 @@ from utests import SCRIPT_DIR
 
 def build_mocked_session_common_request(alias='alias', url='http://mocking.rules',
                                         verify=None, cookies={}):
-    keywords = RequestsLibrary()
+    keywords = HttpxLibrary()
     session = keywords.create_session(alias, url, verify=verify, cookies=cookies)
     # this prevents a real network call from being executed
     session.get = mock.MagicMock()

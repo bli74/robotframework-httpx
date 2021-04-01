@@ -1,10 +1,10 @@
 from robot.api.deco import keyword
 
-from RequestsLibrary.utils import warn_if_equal_symbol_in_url
+from HttpxLibrary.utils import warn_if_equal_symbol_in_url
 from .SessionKeywords import SessionKeywords
 
 
-class RequestsOnSessionKeywords(SessionKeywords):
+class HttpxOnSessionKeywords(SessionKeywords):
 
     @warn_if_equal_symbol_in_url
     @keyword("GET On Session")

@@ -1,5 +1,5 @@
 *** Settings ***
-Library   RequestsLibrary
+Library   HttpxLibrary
 
 *** Test Cases ***
 Test NTLM Session without installed library

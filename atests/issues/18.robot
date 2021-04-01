@@ -1,7 +1,7 @@
 *** Settings ***
 Library  Collections
 Library  String
-Library  RequestsLibrary
+Library  HttpxLibrary
 Library  OperatingSystem
 Suite Teardown  Delete All Sessions
 

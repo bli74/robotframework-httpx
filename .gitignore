@@ -22,7 +22,7 @@ include/
 lib/
 test.py
 bin/
-src/robotframework_requests.egg-info/
+src/robotframework_httpx.egg-info/
 
 # ignore virtuvalenv
 venv/*

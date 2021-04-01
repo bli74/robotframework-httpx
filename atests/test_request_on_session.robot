@@ -1,7 +1,7 @@
 *** Settings ***
 Library  Collections
 Library  String
-Library  RequestsLibrary
+Library  HttpxLibrary
 Resource  res_setup.robot
 
 Suite Setup     Setup Flask Http Server
@@ -98,17 +98,17 @@ Get Request And Fail By Expecting A 200 Status With A Message
 Get Request Expect An Error And Evaluate Response
     [Tags]  get
     ${resp}=    GET On Session  ${GLOBAL_SESSION}  /status/401  expected_status=401
-    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason}
+    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason_phrase}
 
 Get Request Expect Any Status And Continue On Error
     [Tags]  get
     ${resp}=    GET On Session  ${GLOBAL_SESSION}  /status/404  expected_status=ANY
-    Should Be Equal As Strings  NOT FOUND  ${resp.reason}
+    Should Be Equal As Strings  NOT FOUND  ${resp.reason_phrase}
 
 Get Request Expect Anything Status And Continue On Error
     [Tags]  get
     ${resp}=    GET On Session  ${GLOBAL_SESSION}  /status/404  expected_status=Anything
-    Should Be Equal As Strings  NOT FOUND  ${resp.reason}
+    Should Be Equal As Strings  NOT FOUND  ${resp.reason_phrase}
 
 Post Request On Existing Session
     [Tags]  post
@@ -137,12 +137,12 @@ Post Request With Json
 Post Request Expect An Error And Evaluate Response
     [Tags]  post
     ${resp}=    POST On Session  ${GLOBAL_SESSION}  /status/401  expected_status=401
-    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason}
+    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason_phrase}
 
 Post Request Expect Anything Status And Continue On Error
     [Tags]  get
     ${resp}=    POST On Session  ${GLOBAL_SESSION}  /status/400  expected_status=anything
-    Should Be Equal As Strings  BAD REQUEST  ${resp.reason}
+    Should Be Equal As Strings  BAD REQUEST  ${resp.reason_phrase}
 
 Put Request On Existing Session
     [Tags]  put
@@ -171,7 +171,7 @@ Put Request With Json
 Put Request Expect An Error And Evaluate Response
     [Tags]  put
     ${resp}=    PUT On Session  ${GLOBAL_SESSION}  /status/401  expected_status=401
-    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason}
+    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason_phrase}
 
 Head Request On Existing Session
     [Tags]  head
@@ -206,7 +206,7 @@ Head Request And Fail By Default On Http Error
 Head Request Expect An Error And Evaluate Response
     [Tags]  head
     ${resp}=    HEAD On Session  ${GLOBAL_SESSION}  /status/401  expected_status=401
-    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason}
+    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason_phrase}
 
 Patch Request On Existing Session
     [Tags]  Patch
@@ -235,7 +235,7 @@ Patch Request With Json
 Patch Request Expect An Error And Evaluate Response
     [Tags]  Patch
     ${resp}=    PATCH On Session  ${GLOBAL_SESSION}  /status/401  expected_status=401
-    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason}
+    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason_phrase}
 
 Delete Request On Existing Session
     [Tags]  Delete
@@ -250,7 +250,7 @@ Delete Request Should Have Delete Method
 Delete Request Expect An Error And Evaluate Response
     [Tags]  Delete
     ${resp}=    DELETE On Session  ${GLOBAL_SESSION}  /status/202  expected_status=202
-    Should Be Equal As Strings  ACCEPTED  ${resp.reason}
+    Should Be Equal As Strings  ACCEPTED  ${resp.reason_phrase}
 
 Options Request On Existing Session
     [Tags]  options

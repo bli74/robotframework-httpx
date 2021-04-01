@@ -30,33 +30,33 @@ TEST_REQUIRE = ['robotframework>=3.2.1', 'pytest', 'flask', 'six', 'coverage', '
     else ['robotframework>=3.2.1', 'pytest', 'flask', 'coverage', 'flake8', 'mock']
 
 VERSION = None
-version_file = join(dirname(abspath(__file__)), 'src', 'RequestsLibrary', 'version.py')
+version_file = join(dirname(abspath(__file__)), 'src', 'HttpxLibrary', 'version.py')
 with open(version_file) as file:
     code = compile(file.read(), version_file, 'exec')
     exec(code)
 
-with io.open('README.md', mode='rt', encoding='utf-8') as file:
-    readme = file.read()
+DESCRIPTION = """
+Robot Framework keyword library wrapper around the HTTP client library httpx.
+"""[1:-1]
 
-setup(name='robotframework-requests',
+setup(name='robotframework-httpx',
       version=VERSION,
-      description='Robot Framework keyword library wrapper around requests',
-      long_description=readme,
-      long_description_content_type='text/markdown',
-      author='Bulkan Savun Evcimen',
+      description='Robot Framework keyword library wrapper around httpx',
+      long_description=DESCRIPTION,
+      author='Bulkan',
       author_email='bulkan@gmail.com',
-      maintainer='Luca Giovenzana',
-      maintainer_email='luca@giovenzana.org',
-      url='https://github.com/MarketSquare/robotframework-requests',
+      maintainer='Carl-Fredrik Sundstrom',
+      maintainer_email='carl.f.sundstrom@gmail.com',
+      url='https://github.com/',
       license='MIT',
-      keywords='robotframework testing test automation http client requests rest api',
+      keywords='robotframework testing test automation http client httpx rest api',
       platforms='any',
       classifiers=CLASSIFIERS.splitlines(),
       package_dir={'': 'src'},
-      packages=['RequestsLibrary'],
+      packages=['HttpxLibrary'],
       install_requires=[
           'robotframework',
-          'requests'
+          'httpx'
       ],
       extras_require={
           'test': TEST_REQUIRE

@@ -1,9 +1,9 @@
 import json
 import os
 
-from requests import Request
+from httpx import Request
 
-from RequestsLibrary.log import format_data_to_log_string, log_request, log_response
+from HttpxLibrary.log import format_data_to_log_string, log_request, log_response
 from utests import SCRIPT_DIR
 from utests import mock
 
@@ -45,27 +45,27 @@ def test_format_with_file_descriptor():
         assert data_str == repr(f)
 
 
-@mock.patch('RequestsLibrary.log.logger')
+@mock.patch('HttpxLibrary.log.logger')
 def test_log_request(mocked_logger):
     request = Request(method='get', url='http://mock.rulezz')
-    request = request.prepare()
+#    request = request.prepare()
     response = mock.MagicMock()
     response.history = []
     response.request = request
     log_request(response)
     assert mocked_logger.info.call_args[0][0] == ("%s Request : " % request.method +
                                                   "url=%s \n " % request.url +
-                                                  "path_url=%s \n " % request.path_url +
-                                                  "headers=%s \n " % request.headers +
-                                                  "body=%s \n " % request.body)
+#                                                  "path_url=%s \n " % request.path_url +
+                                                  "headers=%s \n " % request.headers) 
+                                                  #"body=%s \n " % request.body)
 
 
-@mock.patch('RequestsLibrary.log.logger')
+@mock.patch('HttpxLibrary.log.logger')
 def test_log_request_with_redirect(mocked_logger):
     request = Request(method='get', url='http://mock.rulezz/redirected')
-    request = request.prepare()
+#    request = request.prepare()
     original = Request(method='get', url='http://mock.rulezz/original')
-    original = original.prepare()
+#    original = original.prepare()
     response = mock.MagicMock()
     response.request = request
     response0 = mock.MagicMock()
@@ -74,12 +74,12 @@ def test_log_request_with_redirect(mocked_logger):
     log_request(response)
     assert mocked_logger.info.call_args[0][0] == ("%s Request : " % request.method +
                                                   "url=%s (redirected) \n " % response.history[0].request.url +
-                                                  "path_url=%s \n " % response.history[0].request.path_url +
-                                                  "headers=%s \n " % request.headers +
-                                                  "body=%s \n " % request.body)
+#                                                  "path_url=%s \n " % response.history[0].request.path_url +
+                                                  "headers=%s \n " % request.headers)
+                                                  #"body=%s \n " % request.body)
 
 
-@mock.patch('RequestsLibrary.log.logger')
+@mock.patch('HttpxLibrary.log.logger')
 def test_log_response(mocked_logger):
     response = mock.MagicMock()
     response.url = 'http://mock.rulezz'
@@ -121,7 +121,7 @@ def test_format_data_to_log_string_truncated_3():
     assert truncated == data
 
 
-@mock.patch('RequestsLibrary.log.logging')
+@mock.patch('HttpxLibrary.log.logging')
 def test_format_data_not_truncate_debug_level(mocked_logger):
     data = ''
     for i in range(0, 100001):
@@ -131,7 +131,7 @@ def test_format_data_not_truncate_debug_level(mocked_logger):
     assert truncated == data
 
 
-@mock.patch('RequestsLibrary.log.logging')
+@mock.patch('HttpxLibrary.log.logging')
 def test_format_data_not_truncate_trace_level(mocked_logger):
     data = ''
     for i in range(0, 100001):
@@ -141,7 +141,7 @@ def test_format_data_not_truncate_trace_level(mocked_logger):
     assert truncated == data
 
 
-@mock.patch('RequestsLibrary.log.logging')
+@mock.patch('HttpxLibrary.log.logging')
 def test_format_data_truncate_info_level(mocked_logger):
     data = ''
     for i in range(0, 100001):

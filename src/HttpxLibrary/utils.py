@@ -2,12 +2,12 @@ import io
 import json
 import types
 
-from requests.status_codes import codes
-from requests.structures import CaseInsensitiveDict
+from httpx._status_codes import codes
+#from httpx._structures import CaseInsensitiveDict
 from robot.api import logger
 
-from RequestsLibrary.compat import urlencode, PY3
-from RequestsLibrary.exceptions import UnknownStatusError
+from HttpxLibrary.compat import urlencode, PY3
+from HttpxLibrary.exceptions import UnknownStatusError
 
 
 class WritableObject:
@@ -42,8 +42,8 @@ def merge_headers(session, headers):
         merged_headers = session.headers.copy()
 
     # Make sure merged_headers are CaseInsensitiveDict
-    if not isinstance(merged_headers, CaseInsensitiveDict):
-        merged_headers = CaseInsensitiveDict(merged_headers)
+    #if not isinstance(merged_headers, CaseInsensitiveDict):
+    #    merged_headers = CaseInsensitiveDict(merged_headers)
 
     merged_headers.update(headers)
     return merged_headers

@@ -1,7 +1,7 @@
 *** Settings ***
 Library  Collections
 Library  String
-Library  RequestsLibrary
+Library  HttpxLibrary
 Library  OperatingSystem
 Library  customAuthenticator.py
 Library  base64Decode.py
@@ -24,10 +24,10 @@ Readme Test
     ${resp_google}=   GET On Session     google             /           expected_status=200
     ${resp_json}=     GET On Session     jsonplaceholder    /posts/1
 
-    Should Be Equal As Strings           ${resp_google.reason}    OK
+    Should Be Equal As Strings           ${resp_google.reason_phrase}    OK
     Dictionary Should Contain Value      ${resp_json.json()}    sunt aut facere repellat provident occaecati excepturi optio reprehenderit
 
-    &{data}=        Create dictionary  title=Robotframework requests  body=This is a test!  userId=1
+    &{data}=        Create dictionary  title=Robotframework httpx  body=This is a test!  userId=1
     ${resp}=        POST On Session    jsonplaceholder     /posts    json=${data}
 
     Status Should Be                 201    ${resp}
@@ -83,7 +83,7 @@ Get HTTPS with Client Side Certificates
 Get With Auth
     [Tags]  get     get-cert
     ${auth}=  Create List  user   passwd
-    Create Session    httpbin    https://httpbin.org     auth=${auth}   verify=${CURDIR}${/}cacert.pem
+    Create Session    httpbin    https://httpbin.org     _auth=${auth}   verify=${CURDIR}${/}cacert.pem
     ${resp}=  Get Request  httpbin  /basic-auth/user/passwd
     Should Be Equal As Strings  ${resp.status_code}  200
     Should Be Equal As Strings  ${resp.json()['authenticated']}  True

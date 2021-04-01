@@ -6,13 +6,13 @@ from robot.libraries.BuiltIn import BuiltIn
 from robot.utils.asserts import assert_equal
 
 
-class RequestsKeywords(object):
+class HttpxKeywords(object):
     ROBOT_LIBRARY_SCOPE = 'Global'
 
     def __init__(self):
         self._cache = robot.utils.ConnectionCache('No sessions created')
         self.builtin = BuiltIn()
-        self.debug = 0
+        self.debug = 1
 
     @keyword("Status Should Be")
     def status_should_be(self, expected_status, response, msg=None):

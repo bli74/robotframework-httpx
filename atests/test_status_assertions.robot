@@ -1,5 +1,5 @@
 *** Settings ***
-Library  RequestsLibrary
+Library  HttpxLibrary
 Resource  res_setup.robot
 
 Suite Setup     Setup Flask Http Server

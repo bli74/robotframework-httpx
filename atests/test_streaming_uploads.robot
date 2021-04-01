@@ -1,5 +1,5 @@
 *** Settings ***
-Library  RequestsLibrary
+Library  HttpxLibrary
 Library  OperatingSystem
 Library  base64Decode.py
 Resource  res_setup.robot
