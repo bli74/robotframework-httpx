@@ -24,8 +24,8 @@ def parse_named_status(status_code):
     """
     Converts named status from human readable to integer
     """
-    code = status_code.lower().replace(' ', '_')
-    code = codes.get(code)
+    code = status_code.upper().replace(' ', '_')
+    code = codes[code]
     if not code:
         raise UnknownStatusError(status_code)
     return code
