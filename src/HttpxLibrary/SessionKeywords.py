@@ -95,8 +95,10 @@ class SessionKeywords(HttpxKeywords):
             s.verify = verify
 
         # cant pass these into the Session anymore
-        self.timeout = float(timeout) if timeout is not None else None
-        self.cookies = cookies
+        # self.timeout = float(timeout) if timeout is not None else None
+        # self.cookies = cookies
+        s.cookies.update(cookies)
+        s.timeout = float(timeout) if timeout is not None else None
 
         s.url = url
 
