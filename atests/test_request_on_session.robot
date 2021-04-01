@@ -82,7 +82,7 @@ Get Request With Unordered Parameters
 
 Get Request And Fail By Default On Http Error
     [Tags]  get
-    Run Keyword And Expect Error  HTTPError: 400*
+    Run Keyword And Expect Error  HTTPStatusError: 400*
     ...                           GET On Session  ${GLOBAL_SESSION}  /status/400
 
 Get Request And Fail By Expecting A 200 Status
@@ -200,7 +200,7 @@ Head Request With Header
 
 Head Request And Fail By Default On Http Error
     [Tags]  head
-    Run Keyword And Expect Error  HTTPError: 400*
+    Run Keyword And Expect Error  HTTPStatusError: 400*
     ...                           HEAD On Session  ${GLOBAL_SESSION}  /status/400
 
 Head Request Expect An Error And Evaluate Response
