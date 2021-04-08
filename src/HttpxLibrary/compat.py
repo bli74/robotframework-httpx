@@ -1,5 +1,5 @@
-import copy
 import sys
+from collections import OrderedDict
 
 PY3 = sys.version_info > (3,)
 

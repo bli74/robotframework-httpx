@@ -1,4 +1,3 @@
-from .DeprecatedKeywords import DeprecatedKeywords
 from .HttpxOnSessionKeywords import HttpxOnSessionKeywords
 from .version import VERSION
 
