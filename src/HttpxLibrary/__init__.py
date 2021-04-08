@@ -12,11 +12,11 @@ HttpxKeywords (common requests and sessionless keywords)
         |_ DeprecatedKeywords (old keywords that need sessions)
         |_ HttpxOnSessionKeywords (new keywords that use sessions)
         
-HttpxLibrary (extends HttpxOnSessionKeywords, DeprecatedKeywords)
+HttpxLibrary (extends HttpxOnSessionKeywords)
 """
 
 
-class HttpxLibrary(HttpxOnSessionKeywords, DeprecatedKeywords):
+class HttpxLibrary(HttpxOnSessionKeywords):
     """ HttpxLibrary is a Robot Framework library aimed to provide HTTP api testing functionalities
      by wrapping the well known Python httpx Library.
 
