@@ -1,4 +1,4 @@
-import json
+from abc import abstractmethod
 
 import robot
 from robot.api.deco import keyword
@@ -49,7 +49,7 @@ class HttpxKeywords(object):
 
         For a more versatile assert keyword see `Status Should Be`.
         """
-        self._check_status(None, response, msg=None)
+        self._check_status(None, response, msg)
 
     @staticmethod
     @keyword("Get File For Streaming Upload")
@@ -64,3 +64,9 @@ class HttpxKeywords(object):
         if used outside this library it's up to the caller to close it.
         """
         return open(path, 'rb')
+
+    @abstractmethod
+    def _check_status(expected_status, resp, msg=None):
+        """
+        Implemented in derived classes.
+        """

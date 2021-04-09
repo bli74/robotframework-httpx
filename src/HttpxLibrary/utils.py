@@ -3,11 +3,10 @@ import json
 import types
 
 from httpx._status_codes import codes
-#from httpx._structures import CaseInsensitiveDict
 from robot.api import logger
 
-from HttpxLibrary.compat import urlencode, PY3
-from HttpxLibrary.exceptions import UnknownStatusError
+from .compat import urlencode, PY3, CaseInsensitiveDict
+from .exceptions import UnknownStatusError
 
 
 class WritableObject:
@@ -42,8 +41,8 @@ def merge_headers(session, headers):
         merged_headers = session.headers.copy()
 
     # Make sure merged_headers are CaseInsensitiveDict
-    #if not isinstance(merged_headers, CaseInsensitiveDict):
-    #    merged_headers = CaseInsensitiveDict(merged_headers)
+    if not isinstance(merged_headers, CaseInsensitiveDict):
+        merged_headers = CaseInsensitiveDict(merged_headers)
 
     merged_headers.update(headers)
     return merged_headers
@@ -76,7 +75,7 @@ def json_pretty_print(content):
 def is_string_type(data):
     if PY3 and isinstance(data, str):
         return True
-    elif not PY3 and isinstance(data, unicode): # noqa
+    if not PY3 and isinstance(data, unicode): # noqa
         return True
     return False
 
