@@ -193,7 +193,9 @@ Post Request With Binary Data in Dictionary
     ${resp}  Post On Session  ${test_session}  /anything  data=${data}  headers=${headers}
     Should Be Equal As Strings  ${resp.status_code}  200
     Should Be Equal As Strings     ${resp.json()['method']}   POST
-    Should Contain  ${resp.json()['form']['name']}  \u5ea6\u5047\u6751
+    ${expected_data}  Get From Dictionary  ${data}  name
+    ${expected_data}  Convert To String  ${expected_data}
+    Should Contain  ${resp.json()['form']['name']}  ${expected_data}
 
 Post Request With Binary Data
     [Tags]  post

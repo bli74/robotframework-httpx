@@ -78,13 +78,8 @@ Get Request And Fail By Default On Http Error
 
 Get Request And Fail By Expecting A 200 Status
     [Tags]  get
-    Run Keyword And Expect Error  Url: http://localhost:5000/status/404 Expected status: 404 != 200
+    Run Keyword And Expect Error  HTTPStatusError: 404 Client Error: NOT FOUND for url: http://localhost:5000/status/404*
     ...                           GET On Session  ${GLOBAL_SESSION}  /status/404
-
-Get Request And Fail By Expecting A 200 Status With A Message
-    [Tags]  get
-    Run Keyword And Expect Error  Custom msg Url: http://localhost:5000/status/404?param Expected status: 404 != 200
-    ...                           GET On Session  ${GLOBAL_SESSION}  /status/404  Custom msg
 
 Get Request Expect An Error And Evaluate Response
     [Tags]  get
@@ -122,8 +117,7 @@ Post Request With Json
     ${body}            Create Dictionary  a=1  b=2
     ${resp}            POST On Session  ${GLOBAL_SESSION}  /anything  json=${body}
     Status Should Be    OK  ${resp}
-    ${data}            To Json  ${resp.json()}[data]
-    Dictionaries Should Be Equal  ${data}  ${body}
+    Dictionaries Should Be Equal  ${resp.json()}[json]  ${body}
 
 Post Request Expect An Error And Evaluate Response
     [Tags]  post
@@ -156,8 +150,7 @@ Put Request With Json
     ${body}            Create Dictionary  a=1  b=2
     ${resp}            PUT On Session  ${GLOBAL_SESSION}  /anything  json=${body}
     Status Should Be    OK  ${resp}
-    ${data}            To Json  ${resp.json()}[data]
-    Dictionaries Should Be Equal  ${data}  ${body}
+    Dictionaries Should Be Equal  ${resp.json()}[json]  ${body}
 
 Put Request Expect An Error And Evaluate Response
     [Tags]  put
@@ -220,13 +213,12 @@ Patch Request With Json
     ${body}            Create Dictionary  a=1  b=2
     ${resp}            PATCH On Session  ${GLOBAL_SESSION}  /anything  json=${body}
     Status Should Be    OK  ${resp}
-    ${data}            To Json  ${resp.json()}[data]
-    Dictionaries Should Be Equal  ${data}  ${body}
+    Dictionaries Should Be Equal  ${resp.json()}[json]  ${body}
 
 Patch Request Expect An Error And Evaluate Response
     [Tags]  Patch
     ${resp}    PATCH On Session  ${GLOBAL_SESSION}  /status/401  expected_status=401
-    Should Be Equal As Strings  UNAUTHORIZED  ${resp.reason}
+    Should Be Equal As Strings  UNAUTHORIZED  ${resp.extensions['reason_phrase']}
 
 Delete Request On Existing Session
     [Tags]  Delete
@@ -241,7 +233,7 @@ Delete Request Should Have Delete Method
 Delete Request Expect An Error And Evaluate Response
     [Tags]  Delete
     ${resp}    DELETE On Session  ${GLOBAL_SESSION}  /status/202  expected_status=202
-    Should Be Equal As Strings  ACCEPTED  ${resp.reason}
+    Should Be Equal As Strings  ACCEPTED  ${resp.extensions['reason_phrase']}
 
 Options Request On Existing Session
     [Tags]  options

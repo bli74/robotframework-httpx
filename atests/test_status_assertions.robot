@@ -10,17 +10,17 @@ Suite Teardown  Teardown Flask Http Server And Sessions
 
 Request And Status Should Be Different
     [Tags]  get  status
-    ${resp}  Get On Session  ${GLOBAL_SESSION}  /status/404
-    Run Keyword And Expect Error  Url: http://localhost:5000/status/404 Expected status: 404 != 201  Status Should Be  201  ${resp}
+    Run Keyword And Expect Error  Url: http://localhost:5000/status/404 Expected status: 404 != 201  Status Should Be  201
+    ...  Get On Session  ${GLOBAL_SESSION}  /status/404  expected_status=201
 
 Request And Status Should Be Equal
     [Tags]  get  status
-    ${resp}  Get On Session  ${GLOBAL_SESSION}  /status/404
+    ${resp}  Get On Session  ${GLOBAL_SESSION}  /status/404  expected_status=404
     Status Should Be  404  ${resp}
 
 Request And Status Should Be A Named Status Code
     [Tags]  get  status
-    ${resp}  Get On Session  ${GLOBAL_SESSION}  /status/418
+    ${resp}  Get On Session  ${GLOBAL_SESSION}  /status/418  expected_status=418
     Status Should Be  I am a teapot  ${resp}
 
 Request And Status Should Be An Unknown Named Status
