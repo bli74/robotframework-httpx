@@ -15,7 +15,7 @@ ${HTTP_LOCAL_SERVER}    http://localhost:5000
 *** Test Cases ***
 Retry Get Request Because Of 502 Error With Default Config
     [Tags]  get  retry
-    ${retry_status_list}=   Create List  502  503
+    ${retry_status_list}   Create List  502  503
     Create Session  http_server  ${HTTP_LOCAL_SERVER}  http2=False
     Run Keyword And Expect Error  RetryError: *   Get Request  http_server  /status/502
 
