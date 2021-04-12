@@ -4,8 +4,9 @@ Library  String
 Library  HttpxLibrary
 Resource  res_setup.robot
 
-#Suite Setup     Setup Flask Http Server
-#Suite Teardown  Teardown Flask Http Server And Sessions
+Suite Setup     Run Keywords  Setup Flask Http Server
+...             AND  Wait Until Http Server Is Up And Running
+Suite Teardown  Teardown Flask Http Server And Sessions
 
 *** Test Cases ***
 

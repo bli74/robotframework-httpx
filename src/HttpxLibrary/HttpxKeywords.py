@@ -38,7 +38,7 @@ class HttpxKeywords(object):
         self._check_status(expected_status, response, msg)
 
     @keyword("Request Should Be Successful")
-    def request_should_be_successful(self, response):
+    def request_should_be_successful(self, response, msg=None):
         """
         Fails if response status code is a client or server error (4xx, 5xx).
 

@@ -7,10 +7,11 @@ Library  customAuthenticator.py
 Library  base64Decode.py
 Resource  res_setup.robot
 
+Suite Setup     Run Keywords  Setup Flask Http Server
+...             AND  Wait Until Http Server Is Up And Running
+Suite Teardown  Teardown Flask Http Server And Sessions
 Test Setup      Setup Test Session
 Test Teardown   Teardown Test Session
-Suite Setup     Setup Flask Http Server
-Suite Teardown  Teardown Flask Http Server And Sessions
 
 
 *** Variables ***
