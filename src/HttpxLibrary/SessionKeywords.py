@@ -6,7 +6,7 @@ from HttpxLibrary import utils, log
 from HttpxLibrary.compat import httplib, PY3
 from HttpxLibrary.exceptions import InvalidResponse, InvalidExpectedStatus
 from HttpxLibrary.utils import is_file_descriptor, is_string_type
-from httpx import Response
+from httpx import Client, HTTPTransport, Response
 from robot.api import logger
 from robot.api.deco import keyword
 from robot.utils.asserts import assert_equal
@@ -26,25 +26,40 @@ class SessionKeywords(HttpxKeywords):
             self,
             alias: str,
             url: str,
+            retries: int = 0,
+            disable_warnings: bool = False,
+            debug: bool = False,
             **kwargs: dict
     ) -> httpx.Client:
 
         logger.debug('Creating session: %s' % alias)
 
-        # Get and remove arguments used locally from **kwargs
-        debug = kwargs.pop('debug', False)
-        max_retries = kwargs.pop('max_retries', 3)
-        disable_warnings = kwargs.pop('disable_warnings', False)
-        timeout = kwargs.pop('timeout', None)
+        # Retries parameter not supported directly by Client()
+        if retries is not None and retries > 0:
+            # Merge named arguments and **kwargs from HTTPTransport()
+            transport_code = httpx.HTTPTransport.__init__.__code__
+            num_args = transport_code.co_argcount + transport_code.co_kwonlyargcount
+            transport_keywords = transport_code.co_cellvars
+            if num_args > 0:
+                transport_keywords += transport_code.co_varnames[1:num_args]
+            # Initialize with named parameters and modified defaults
+            transport_args = dict()
+            for kw in transport_keywords:
+                if kw in kwargs:
+                    transport_args[kw] = kwargs[kw]
+            kwargs['transport'] = HTTPTransport(**transport_args)
 
-        # Normalize max_retries
-        try:
-            max_retries = int(max_retries)
-        except ValueError as err:
-            raise ValueError("Error converting session parameter: %s" % err)
-
-        kwargs['transport'] = httpx.HTTPTransport(retries=max_retries)
-        s = session = httpx.Client(**kwargs)
+        # Merge named arguments and **kwargs from Client()
+        client_code = httpx.Client.__init__.__code__
+        num_args = client_code.co_argcount + client_code.co_kwonlyargcount
+        client_keywords = client_code.co_cellvars
+        if num_args > 0:
+            client_keywords += client_code.co_varnames[1:num_args]
+        client_args = dict()
+        for kw in client_keywords:
+            if kw in kwargs:
+                client_args[kw] = kwargs[kw]
+        s = session = Client(**client_args)
 
         # Disable requests warnings, useful when you have large number of testcase
         # you will observe drastical changes in Robot log.html and output.xml files size
@@ -138,6 +153,79 @@ class SessionKeywords(HttpxKeywords):
         return self._create_session(
             alias=alias,
             url=url,
+            **kwargs)
+
+    @keyword("Create HTTP2 Session")
+    def create_http2_session(
+            self,
+            alias,
+            url,
+            **kwargs):
+        """ Create Session: create a HTTP session to a server
+
+        ``alias`` Robot Framework alias to identify the session
+
+        ``url`` Base url of the server
+
+        ``auth`` Username and password pair or None for Basic Authentication
+                 to use when sending requests.
+                 See httpx.BasicAuth()
+
+        ``params`` Query parameters to include in request URLs, as
+                   a string, dictionary, or sequence of two-tuples.
+                   See httpx.Client()
+
+        ``headers`` Dictionary of HTTP headers to include when sending requests.
+                    See httpx.Client()
+
+        ``cookies`` Dictionary of Cookie items to include when sending requests.
+                    See httpx.Client()
+
+        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
+                   of requested hosts. Either `True` (default CA bundle),
+                   a path to an SSL certificate file, or `False` (disable verification).
+                   See httpx.Client()
+
+        ``cert`` An SSL certificate used by the requested host to authenticate the client.
+                 Either a path to an SSL certificate file, or two-tuple of (certificate file,
+                 key file), or a three-tuple of (certificate file, key file, password).
+                 See httpx.Client()
+
+        ``proxies`` A dictionary mapping proxy keys to proxy URLs.
+                    See httpx.Client()
+
+        ``timeout`` The timeout configuration to use when sending requests.
+                    See httpx.Client()
+
+        ``limits`` The limits configuration to use.
+                   See httpx.Client()
+
+        ``max_redirects`` The maximum number of redirect responses that should be followed.
+                          See httpx.Client()
+
+        ``debug`` Enable http verbosity option more information
+                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
+
+        ``max_retries`` Number of maximum retries each connection should attempt.
+                        By default it will retry 3 times in case of connection errors only.
+                        A 0 value will disable any kind of retries regardless of other retry settings.
+                        In case the number of retries is reached a retry exception is raised.
+
+        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+
+        """
+        auth = kwargs.pop('auth', None)
+        if auth is not None:
+            kwargs['auth'] = httpx.BasicAuth(*auth)
+
+        logger.info('Creating Session with Basic Authentication using : alias=%s, url=%s, kwargs=%s' \
+                    % (alias, url, kwargs))
+
+        return self._create_session(
+            alias=alias,
+            url=url,
+            http2=True,
+            http1=False,
             **kwargs)
 
     @keyword("Create Custom Session")
@@ -393,8 +481,10 @@ class SessionKeywords(HttpxKeywords):
         ``headers`` Dictionary of headers merge into session
         """
         session = self._cache.switch(alias)
-        session.headers = merge_setting(headers, session.headers)
-        session.cookies = merge_cookies(session.cookies, cookies)
+        if headers is not None:
+            session.headers.update(headers)
+        if cookies is not None:
+            session.cookies.update(cookies)
 
     def _common_request(
             self,
@@ -418,7 +508,7 @@ class SessionKeywords(HttpxKeywords):
 
         data = kwargs.get('data', None)
         # epkcfsm remove this if request was a get
-        if method is "get":
+        if method == "get":
             if is_file_descriptor(data):
                 data.close()
 

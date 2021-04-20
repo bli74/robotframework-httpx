@@ -55,12 +55,6 @@ Get Request with Url Parameters
     Should Be Equal As Strings     ${jsondata['method']}   GET
     Should Be Equal     ${jsondata['args']}     ${params}
 
-Get HTTPS & Verify Cert
-    [Tags]  get     get-cert
-    Create Session    httpbin    https://httpbin.org   verify=True
-    ${resp}  Get On Session  httpbin  /get
-    Should Be Equal As Strings  ${resp.status_code}  200
-
 Get HTTPS & Verify Cert with a CA bundle
     [Tags]  get     get-cert
     Create Session    httpbin    https://httpbin.org   verify=${CURDIR}${/}cacert.pem
