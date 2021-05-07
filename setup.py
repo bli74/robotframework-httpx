@@ -56,7 +56,8 @@ setup(name='robotframework-httpx',
       packages=['HttpxLibrary'],
       install_requires=[
           'robotframework',
-          'httpx'
+          'httpx',
+          'requests'
       ],
       extras_require={
           'test': TEST_REQUIRE
