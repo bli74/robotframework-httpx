@@ -2,17 +2,17 @@ import logging
 import sys
 
 import httpx
-from HttpxLibrary import utils, log
-from HttpxLibrary.compat import httplib, PY3
-from HttpxLibrary.exceptions import InvalidResponse, InvalidExpectedStatus
-from HttpxLibrary.utils import is_file_descriptor, is_string_type
 from httpx import Client, HTTPTransport, Response
+from httpx._config import DEFAULT_LIMITS, DEFAULT_MAX_REDIRECTS, DEFAULT_TIMEOUT_CONFIG
 from robot.api import logger
 from robot.api.deco import keyword
 from robot.utils.asserts import assert_equal
 
+from HttpxLibrary import utils, log
+from HttpxLibrary.compat import httplib, PY3
+from HttpxLibrary.exceptions import InvalidResponse, InvalidExpectedStatus
+from HttpxLibrary.utils import is_file_descriptor, is_string_type
 from .HttpxKeywords import HttpxKeywords
-from .compat import merge_setting, merge_cookies
 
 try:
     from httpx_ntlm import HttpNtlmAuth
@@ -21,45 +21,73 @@ except ImportError:
 
 
 class SessionKeywords(HttpxKeywords):
+    DEFAULT_RETRIES = 3
 
     def _create_session(
             self,
             alias: str,
             url: str,
-            retries: int = 0,
-            disable_warnings: bool = False,
-            debug: bool = False,
-            **kwargs: dict
+            # optional named args
+            auth=None,
+            cert=None,
+            cookies={},
+            debug=0,
+            disable_warnings=0,
+            headers={},
+            http1=True,
+            http2=False,
+            limits=DEFAULT_LIMITS,
+            max_redirects=DEFAULT_MAX_REDIRECTS,
+            params={},
+            retries=DEFAULT_RETRIES,
+            timeout=DEFAULT_TIMEOUT_CONFIG,
+            verify=False
     ) -> httpx.Client:
 
-        logger.debug('Creating session: %s' % alias)
+        logger.info('Create Session parameters:'
+                    f'- alias={alias}'
+                    f'- url={url}'
+                    f'- auth={auth}'
+                    f'- cert={cert}'
+                    f'- cookies={cookies}'
+                    f'- headers={headers}'
+                    f'- http1={http1}'
+                    f'- http2={http2}'
+                    f'- limits={limits}'
+                    f'- max_redirects={max_redirects}'
+                    f'- params={params}'
+                    f'- retries={retries}'
+                    f'- timeout={timeout}'
+                    f'- verify={verify}'
 
+        )
+
+        transport = None
         # Retries parameter not supported directly by Client()
         if retries is not None and retries > 0:
-            # Merge named arguments and **kwargs from HTTPTransport()
-            transport_code = httpx.HTTPTransport.__init__.__code__
-            num_args = transport_code.co_argcount + transport_code.co_kwonlyargcount
-            transport_keywords = transport_code.co_cellvars
-            if num_args > 0:
-                transport_keywords += transport_code.co_varnames[1:num_args]
-            # Initialize with named parameters and modified defaults
-            transport_args = dict()
-            for kw in transport_keywords:
-                if kw in kwargs:
-                    transport_args[kw] = kwargs[kw]
-            kwargs['transport'] = HTTPTransport(**transport_args)
+            transport = HTTPTransport(
+                verify=verify,
+                cert=cert,
+                http1=http1,
+                http2=http2,
+                limits=limits,
+                retries=retries
+            )
 
-        # Merge named arguments and **kwargs from Client()
-        client_code = httpx.Client.__init__.__code__
-        num_args = client_code.co_argcount + client_code.co_kwonlyargcount
-        client_keywords = client_code.co_cellvars
-        if num_args > 0:
-            client_keywords += client_code.co_varnames[1:num_args]
-        client_args = dict()
-        for kw in client_keywords:
-            if kw in kwargs:
-                client_args[kw] = kwargs[kw]
-        s = session = Client(**client_args)
+        s = session = Client(
+            auth=auth,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            verify=verify,
+            cert=cert,
+            http1=http1,
+            http2=http2,
+            timeout=timeout,
+            limits=limits,
+            max_redirects=max_redirects,
+            transport=transport
+        )
 
         # Disable requests warnings, useful when you have large number of testcase
         # you will observe drastical changes in Robot log.html and output.xml files size
@@ -86,7 +114,22 @@ class SessionKeywords(HttpxKeywords):
             self,
             alias,
             url,
-            **kwargs):
+            # optional named args
+            auth=None,
+            cert=None,
+            cookies={},
+            debug=0,
+            disable_warnings=0,
+            headers={},
+            http1=True,
+            http2=False,
+            limits=DEFAULT_LIMITS,
+            max_redirects=DEFAULT_MAX_REDIRECTS,
+            params={},
+            retries=DEFAULT_RETRIES,
+            timeout=DEFAULT_TIMEOUT_CONFIG,
+            verify=False
+    ):
         """ Create Session: create a HTTP session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -97,31 +140,27 @@ class SessionKeywords(HttpxKeywords):
                  to use when sending requests.
                  See httpx.BasicAuth()
 
-        ``params`` Query parameters to include in request URLs, as
-                   a string, dictionary, or sequence of two-tuples.
-                   See httpx.Client()
-
-        ``headers`` Dictionary of HTTP headers to include when sending requests.
-                    See httpx.Client()
-
-        ``cookies`` Dictionary of Cookie items to include when sending requests.
-                    See httpx.Client()
-
-        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
-                   of requested hosts. Either `True` (default CA bundle),
-                   a path to an SSL certificate file, or `False` (disable verification).
-                   See httpx.Client()
-
         ``cert`` An SSL certificate used by the requested host to authenticate the client.
                  Either a path to an SSL certificate file, or two-tuple of (certificate file,
                  key file), or a three-tuple of (certificate file, key file, password).
                  See httpx.Client()
 
-        ``proxies`` A dictionary mapping proxy keys to proxy URLs.
+        ``cookies`` Dictionary of Cookie items to include when sending requests.
                     See httpx.Client()
 
-        ``timeout`` The timeout configuration to use when sending requests.
+        ``debug`` Enable http verbosity option more information
+                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
+
+        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+
+        ``headers`` Dictionary of HTTP headers to include when sending requests.
                     See httpx.Client()
+
+        ``http1`` Switch to enable/disable HTTP/1.1 support
+                  See httpx.Client()
+
+        ``http2`` Switch to enable/disable HTTP/2 support
+                  See httpx.Client()
 
         ``limits`` The limits configuration to use.
                    See httpx.Client()
@@ -129,39 +168,66 @@ class SessionKeywords(HttpxKeywords):
         ``max_redirects`` The maximum number of redirect responses that should be followed.
                           See httpx.Client()
 
-        ``http2`` Switch to toggle between HTTP/1 (False) and HTTP/2 (True)
-                  See httpx.Client()
+        ``params`` Query parameters to include in request URLs, as
+                   a string, dictionary, or sequence of two-tuples.
+                   See httpx.Client()
 
-        ``debug`` Enable http verbosity option more information
-                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
-
-        ``max_retries`` Number of maximum retries each connection should attempt.
+        ``retries`` Number of maximum retries each connection should attempt.
                         By default it will retry 3 times in case of connection errors only.
                         A 0 value will disable any kind of retries regardless of other retry settings.
                         In case the number of retries is reached a retry exception is raised.
 
-        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+        ``timeout`` The timeout configuration to use when sending requests.
+                    See httpx.Client()
 
+        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
+                   of requested hosts. Either `True` (default CA bundle),
+                   a path to an SSL certificate file, or `False` (disable verification).
+                   See httpx.Client()
         """
-        auth = kwargs.pop('auth', None)
         if auth is not None:
-            kwargs['auth'] = httpx.BasicAuth(*auth)
+            auth = httpx.BasicAuth(*auth)
 
-        logger.info('Creating Session with Basic Authentication using : alias=%s, url=%s, kwargs=%s' \
-                    % (alias, url, kwargs))
+        logger.info('Create Session with Basic Authentication')
 
         return self._create_session(
             alias=alias,
             url=url,
-            **kwargs)
+            auth=auth,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            verify=verify,
+            cert=cert,
+            http1=http1,
+            http2=http2,
+            timeout=timeout,
+            limits=limits,
+            max_redirects=max_redirects,
+            debug=debug,
+            disable_warnings=disable_warnings,
+            retries=retries
+        )
 
     @keyword("Create HTTP2 Session")
     def create_http2_session(
             self,
             alias,
             url,
-            **kwargs):
-        """ Create Session: create a HTTP session to a server
+            # optional named args
+            auth=None,
+            cert=None,
+            cookies={},
+            debug=0,
+            disable_warnings=0,
+            headers={},
+            limits=DEFAULT_LIMITS,
+            max_redirects=DEFAULT_MAX_REDIRECTS,
+            params={},
+            retries=DEFAULT_RETRIES,
+            timeout=DEFAULT_TIMEOUT_CONFIG,
+            verify=False):
+        """ Create Session: create a HTTP/2 only session to a server
 
         ``alias`` Robot Framework alias to identify the session
 
@@ -171,30 +237,20 @@ class SessionKeywords(HttpxKeywords):
                  to use when sending requests.
                  See httpx.BasicAuth()
 
-        ``params`` Query parameters to include in request URLs, as
-                   a string, dictionary, or sequence of two-tuples.
-                   See httpx.Client()
-
-        ``headers`` Dictionary of HTTP headers to include when sending requests.
-                    See httpx.Client()
-
-        ``cookies`` Dictionary of Cookie items to include when sending requests.
-                    See httpx.Client()
-
-        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
-                   of requested hosts. Either `True` (default CA bundle),
-                   a path to an SSL certificate file, or `False` (disable verification).
-                   See httpx.Client()
-
         ``cert`` An SSL certificate used by the requested host to authenticate the client.
                  Either a path to an SSL certificate file, or two-tuple of (certificate file,
                  key file), or a three-tuple of (certificate file, key file, password).
                  See httpx.Client()
 
-        ``proxies`` A dictionary mapping proxy keys to proxy URLs.
+        ``cookies`` Dictionary of Cookie items to include when sending requests.
                     See httpx.Client()
 
-        ``timeout`` The timeout configuration to use when sending requests.
+        ``debug`` Enable http verbosity option more information
+                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
+
+        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+
+        ``headers`` Dictionary of HTTP headers to include when sending requests.
                     See httpx.Client()
 
         ``limits`` The limits configuration to use.
@@ -203,37 +259,67 @@ class SessionKeywords(HttpxKeywords):
         ``max_redirects`` The maximum number of redirect responses that should be followed.
                           See httpx.Client()
 
-        ``debug`` Enable http verbosity option more information
-                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
+        ``params`` Query parameters to include in request URLs, as
+                   a string, dictionary, or sequence of two-tuples.
+                   See httpx.Client()
 
-        ``max_retries`` Number of maximum retries each connection should attempt.
+        ``retries`` Number of maximum retries each connection should attempt.
                         By default it will retry 3 times in case of connection errors only.
                         A 0 value will disable any kind of retries regardless of other retry settings.
                         In case the number of retries is reached a retry exception is raised.
 
-        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+        ``timeout`` The timeout configuration to use when sending requests.
+                    See httpx.Client()
 
+        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
+                   of requested hosts. Either `True` (default CA bundle),
+                   a path to an SSL certificate file, or `False` (disable verification).
+                   See httpx.Client()
         """
-        auth = kwargs.pop('auth', None)
         if auth is not None:
-            kwargs['auth'] = httpx.BasicAuth(*auth)
+            auth = httpx.BasicAuth(*auth)
 
-        logger.info('Creating Session with Basic Authentication using : alias=%s, url=%s, kwargs=%s' \
-                    % (alias, url, kwargs))
+        logger.info('Create Session with Basic Authentication')
 
         return self._create_session(
             alias=alias,
             url=url,
-            http2=True,
+            auth=auth,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            verify=verify,
+            cert=cert,
             http1=False,
-            **kwargs)
+            http2=True,
+            timeout=timeout,
+            limits=limits,
+            max_redirects=max_redirects,
+            debug=debug,
+            disable_warnings=disable_warnings,
+            retries=retries
+        )
 
     @keyword("Create Custom Session")
     def create_custom_session(
             self,
             alias,
             url,
-            **kwargs):
+            # optional named args
+            auth=None,
+            cert=None,
+            cookies={},
+            debug=0,
+            disable_warnings=0,
+            headers={},
+            http1=True,
+            http2=False,
+            limits=DEFAULT_LIMITS,
+            max_redirects=DEFAULT_MAX_REDIRECTS,
+            params={},
+            retries=DEFAULT_RETRIES,
+            timeout=DEFAULT_TIMEOUT_CONFIG,
+            verify=False):
         """ Create Session: create a HTTP session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -243,31 +329,27 @@ class SessionKeywords(HttpxKeywords):
         ``auth`` A Custom Authentication object to be passed on to the requests library.
                 http://docs.python-requests.org/en/master/user/advanced/#custom-authentication
 
-        ``params`` Query parameters to include in request URLs, as
-                   a string, dictionary, or sequence of two-tuples.
-                   See httpx.Client()
-
-        ``headers`` Dictionary of HTTP headers to include when sending requests.
-                    See httpx.Client()
-
-        ``cookies`` Dictionary of Cookie items to include when sending requests.
-                    See httpx.Client()
-
-        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
-                   of requested hosts. Either `True` (default CA bundle),
-                   a path to an SSL certificate file, or `False` (disable verification).
-                   See httpx.Client()
-
         ``cert`` An SSL certificate used by the requested host to authenticate the client.
                  Either a path to an SSL certificate file, or two-tuple of (certificate file,
                  key file), or a three-tuple of (certificate file, key file, password).
                  See httpx.Client()
 
-        ``proxies`` A dictionary mapping proxy keys to proxy URLs.
+        ``cookies`` Dictionary of Cookie items to include when sending requests.
                     See httpx.Client()
 
-        ``timeout`` The timeout configuration to use when sending requests.
+        ``debug`` Enable http verbosity option more information
+                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
+
+        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+
+        ``headers`` Dictionary of HTTP headers to include when sending requests.
                     See httpx.Client()
+
+        ``http1`` Switch to enable/disable HTTP/1.1 support
+                  See httpx.Client()
+
+        ``http2`` Switch to enable/disable HTTP/2 support
+                  See httpx.Client()
 
         ``limits`` The limits configuration to use.
                    See httpx.Client()
@@ -275,35 +357,62 @@ class SessionKeywords(HttpxKeywords):
         ``max_redirects`` The maximum number of redirect responses that should be followed.
                           See httpx.Client()
 
-        ``http2`` Switch to toggle between HTTP/1 (False) and HTTP/2 (True)
-                  See httpx.Client()
+        ``params`` Query parameters to include in request URLs, as
+                   a string, dictionary, or sequence of two-tuples.
+                   See httpx.Client()
 
-        ``debug`` Enable http verbosity option more information
-                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
-
-        ``max_retries`` Number of maximum retries each connection should attempt.
+        ``retries`` Number of maximum retries each connection should attempt.
                         By default it will retry 3 times in case of connection errors only.
                         A 0 value will disable any kind of retries regardless of other retry settings.
                         In case the number of retries is reached a retry exception is raised.
 
-        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+        ``timeout`` The timeout configuration to use when sending requests.
+                    See httpx.Client()
 
+        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
+                   of requested hosts. Either `True` (default CA bundle),
+                   a path to an SSL certificate file, or `False` (disable verification).
+                   See httpx.Client()
         """
-
-        logger.info('Creating Custom Authenticated Session using : alias=%s, url=%s, kwargs=%s' \
-                    % (alias, url, kwargs))
-
+        logger.info('Creating Custom Authenticated Session')
         return self._create_session(
             alias=alias,
             url=url,
-            **kwargs)
+            auth=auth,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            verify=verify,
+            cert=cert,
+            http1=http1,
+            http2=http2,
+            timeout=timeout,
+            limits=limits,
+            max_redirects=max_redirects,
+            debug=debug,
+            disable_warnings=disable_warnings,
+            retries=retries)
 
     @keyword("Create Digest Session")
     def create_digest_session(
             self,
             alias,
             url,
-            **kwargs):
+            # optional named args
+            auth=None,
+            cert=None,
+            cookies={},
+            debug=0,
+            disable_warnings=0,
+            headers={},
+            http1=True,
+            http2=False,
+            limits=DEFAULT_LIMITS,
+            max_redirects=DEFAULT_MAX_REDIRECTS,
+            params={},
+            retries=DEFAULT_RETRIES,
+            timeout=DEFAULT_TIMEOUT_CONFIG,
+            verify=False):
         """ Create Session: create a HTTP session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -314,31 +423,27 @@ class SessionKeywords(HttpxKeywords):
                  to use when sending requests.
                  See httpx.DigestAuth()
 
-        ``params`` Query parameters to include in request URLs, as
-                   a string, dictionary, or sequence of two-tuples.
-                   See httpx.Client()
-
-        ``headers`` Dictionary of HTTP headers to include when sending requests.
-                    See httpx.Client()
-
-        ``cookies`` Dictionary of Cookie items to include when sending requests.
-                    See httpx.Client()
-
-        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
-                   of requested hosts. Either `True` (default CA bundle),
-                   a path to an SSL certificate file, or `False` (disable verification).
-                   See httpx.Client()
-
         ``cert`` An SSL certificate used by the requested host to authenticate the client.
                  Either a path to an SSL certificate file, or two-tuple of (certificate file,
                  key file), or a three-tuple of (certificate file, key file, password).
                  See httpx.Client()
 
-        ``proxies`` A dictionary mapping proxy keys to proxy URLs.
+        ``cookies`` Dictionary of Cookie items to include when sending requests.
                     See httpx.Client()
 
-        ``timeout`` The timeout configuration to use when sending requests.
+        ``debug`` Enable http verbosity option more information
+                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
+
+        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+
+        ``headers`` Dictionary of HTTP headers to include when sending requests.
                     See httpx.Client()
+
+        ``http1`` Switch to enable/disable HTTP/1.1 support
+                  See httpx.Client()
+
+        ``http2`` Switch to enable/disable HTTP/2 support
+                  See httpx.Client()
 
         ``limits`` The limits configuration to use.
                    See httpx.Client()
@@ -346,38 +451,66 @@ class SessionKeywords(HttpxKeywords):
         ``max_redirects`` The maximum number of redirect responses that should be followed.
                           See httpx.Client()
 
-        ``http2`` Switch to toggle between HTTP/1 (False) and HTTP/2 (True)
-                  See httpx.Client()
+        ``params`` Query parameters to include in request URLs, as
+                   a string, dictionary, or sequence of two-tuples.
+                   See httpx.Client()
 
-        ``debug`` Enable http verbosity option more information
-                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
-
-        ``max_retries`` Number of maximum retries each connection should attempt.
+        ``retries`` Number of maximum retries each connection should attempt.
                         By default it will retry 3 times in case of connection errors only.
                         A 0 value will disable any kind of retries regardless of other retry settings.
                         In case the number of retries is reached a retry exception is raised.
 
-        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+        ``timeout`` The timeout configuration to use when sending requests.
+                    See httpx.Client()
 
+        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
+                   of requested hosts. Either `True` (default CA bundle),
+                   a path to an SSL certificate file, or `False` (disable verification).
+                   See httpx.Client()
         """
-        auth = kwargs.pop('auth', None)
         if auth is not None:
-            kwargs['auth'] = httpx.DigestAuth(*auth)
+            auth = httpx.DigestAuth(*auth)
 
-        logger.info('Creating Session with Digest Authentication using : alias=%s, url=%s, kwargs=%s' \
-                    % (alias, url, kwargs))
+        logger.info('Creating Session with Digest Authentication')
 
         return self._create_session(
             alias=alias,
             url=url,
-            **kwargs)
+            auth=auth,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            verify=verify,
+            cert=cert,
+            http1=http1,
+            http2=http2,
+            timeout=timeout,
+            limits=limits,
+            max_redirects=max_redirects,
+            debug=debug,
+            disable_warnings=disable_warnings,
+            retries=retries)
 
     @keyword("Create Ntlm Session")
     def create_ntlm_session(
             self,
             alias,
             url,
-            **kwargs):
+            # optional named args
+            auth=None,
+            cert=None,
+            cookies={},
+            debug=0,
+            disable_warnings=0,
+            headers={},
+            http1=True,
+            http2=False,
+            limits=DEFAULT_LIMITS,
+            max_redirects=DEFAULT_MAX_REDIRECTS,
+            params={},
+            retries=DEFAULT_RETRIES,
+            timeout=DEFAULT_TIMEOUT_CONFIG,
+            verify=False):
         """ Create Session: create a HTTP session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -387,31 +520,27 @@ class SessionKeywords(HttpxKeywords):
         ``auth`` ['DOMAIN', 'username', 'password'] for NTLM Authentication.
                  See httpx_ntlm.HttpNtlmAuth()
 
-        ``params`` Query parameters to include in request URLs, as
-                   a string, dictionary, or sequence of two-tuples.
-                   See httpx.Client()
-
-        ``headers`` Dictionary of HTTP headers to include when sending requests.
-                    See httpx.Client()
-
-        ``cookies`` Dictionary of Cookie items to include when sending requests.
-                    See httpx.Client()
-
-        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
-                   of requested hosts. Either `True` (default CA bundle),
-                   a path to an SSL certificate file, or `False` (disable verification).
-                   See httpx.Client()
-
         ``cert`` An SSL certificate used by the requested host to authenticate the client.
                  Either a path to an SSL certificate file, or two-tuple of (certificate file,
                  key file), or a three-tuple of (certificate file, key file, password).
                  See httpx.Client()
 
-        ``proxies`` A dictionary mapping proxy keys to proxy URLs.
+        ``cookies`` Dictionary of Cookie items to include when sending requests.
                     See httpx.Client()
 
-        ``timeout`` The timeout configuration to use when sending requests.
+        ``debug`` Enable http verbosity option more information
+                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
+
+        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+
+        ``headers`` Dictionary of HTTP headers to include when sending requests.
                     See httpx.Client()
+
+        ``http1`` Switch to enable/disable HTTP/1.1 support
+                  See httpx.Client()
+
+        ``http2`` Switch to enable/disable HTTP/2 support
+                  See httpx.Client()
 
         ``limits`` The limits configuration to use.
                    See httpx.Client()
@@ -419,38 +548,52 @@ class SessionKeywords(HttpxKeywords):
         ``max_redirects`` The maximum number of redirect responses that should be followed.
                           See httpx.Client()
 
-        ``http2`` Switch to toggle between HTTP/1 (False) and HTTP/2 (True)
-                  See httpx.Client()
+        ``params`` Query parameters to include in request URLs, as
+                   a string, dictionary, or sequence of two-tuples.
+                   See httpx.Client()
 
-        ``debug`` Enable http verbosity option more information
-                  https://docs.python.org/2/library/httplib.html#httplib.HTTPConnection.set_debuglevel
-
-        ``max_retries`` Number of maximum retries each connection should attempt.
+        ``retries`` Number of maximum retries each connection should attempt.
                         By default it will retry 3 times in case of connection errors only.
                         A 0 value will disable any kind of retries regardless of other retry settings.
                         In case the number of retries is reached a retry exception is raised.
 
-        ``disable_warnings`` Disable httpx warning useful when you have large number of testcases
+        ``timeout`` The timeout configuration to use when sending requests.
+                    See httpx.Client()
 
+        ``verify`` SSL certificates (a.k.a CA bundle) used to verify the identity
+                   of requested hosts. Either `True` (default CA bundle),
+                   a path to an SSL certificate file, or `False` (disable verification).
+                   See httpx.Client()
         """
         try:
             HttpNtlmAuth
         except NameError:
             raise AssertionError('httpx-ntlm module not installed')
-        auth = kwargs.pop('auth', None)
         if len(auth) != 3:
             raise AssertionError('Incorrect number of authentication arguments'
                                  ' - expected 3, got {}'.format(len(auth)))
         else:
-            kwargs['auth'] = HttpNtlmAuth('{}\\{}'.format(auth[0], auth[1]),
+            auth = HttpNtlmAuth('{}\\{}'.format(auth[0], auth[1]),
                                           auth[2])
-            logger.info('Creating NTLM Session using : alias=%s, url=%s, kwargs=%s '
-                        % (alias, url, kwargs))
+            logger.info('Creating NTLM Session')
 
         return self._create_session(
             alias=alias,
             url=url,
-            **kwargs)
+            auth=auth,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            verify=verify,
+            cert=cert,
+            http1=http1,
+            http2=http2,
+            timeout=timeout,
+            limits=limits,
+            max_redirects=max_redirects,
+            debug=debug,
+            disable_warnings=disable_warnings,
+            retries=retries)
 
     @keyword("Session Exists")
     def session_exists(self, alias):

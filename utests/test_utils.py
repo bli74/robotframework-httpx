@@ -32,9 +32,10 @@ def test_merge_headers_with_session_headers_only():
 
 def test_merge_headers_with_all_none():
     session = httpx.Client()
-    session.headers = None
+    # headers get pre-initialized
+    initial = session.headers
     merged = merge_headers(session, None)
-    assert merged == {}
+    assert merged == initial
 
 
 def test_merge_headers_with_all():
