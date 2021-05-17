@@ -25,8 +25,9 @@ class SessionKeywords(HttpxKeywords):
 
     def _create_session(
             self,
-            alias: str,
-            url: str,
+            alias,
+            url,
+            *,
             # optional named args
             auth=None,
             cert=None,
@@ -114,6 +115,7 @@ class SessionKeywords(HttpxKeywords):
             self,
             alias,
             url,
+            *,
             # optional named args
             auth=None,
             cert=None,
@@ -191,8 +193,8 @@ class SessionKeywords(HttpxKeywords):
         logger.info('Create Session with Basic Authentication')
 
         return self._create_session(
-            alias=alias,
-            url=url,
+            alias,
+            url,
             auth=auth,
             params=params,
             headers=headers,
@@ -214,6 +216,7 @@ class SessionKeywords(HttpxKeywords):
             self,
             alias,
             url,
+            *,
             # optional named args
             auth=None,
             cert=None,
@@ -282,8 +285,8 @@ class SessionKeywords(HttpxKeywords):
         logger.info('Create Session with Basic Authentication')
 
         return self._create_session(
-            alias=alias,
-            url=url,
+            alias,
+            url,
             auth=auth,
             params=params,
             headers=headers,
@@ -305,6 +308,7 @@ class SessionKeywords(HttpxKeywords):
             self,
             alias,
             url,
+            *,
             # optional named args
             auth=None,
             cert=None,
@@ -398,6 +402,7 @@ class SessionKeywords(HttpxKeywords):
             self,
             alias,
             url,
+            *,
             # optional named args
             auth=None,
             cert=None,
@@ -496,6 +501,7 @@ class SessionKeywords(HttpxKeywords):
             self,
             alias,
             url,
+            *,
             # optional named args
             auth=None,
             cert=None,

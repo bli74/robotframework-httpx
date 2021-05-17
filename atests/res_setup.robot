@@ -13,7 +13,7 @@ ${HTTP_LOCAL_SERVER}    http://localhost:5000
 Setup Test Session
     ${test_session}=  Set Variable  test_session
     Set Test Variable  ${test_session}
-    Create Session  ${test_session}  ${HTTP_LOCAL_SERVER}    http2=False
+    Create Session  ${test_session}  ${HTTP_LOCAL_SERVER}    http2=${False}
 
 Teardown Test Session
     Delete All Sessions
@@ -29,7 +29,7 @@ Setup Flask Http Server
     Wait Until Http Server Is Up And Running
 
 Wait Until Http Server Is Up And Running
-    Create Session  wait-until-up  ${HTTP_LOCAL_SERVER}  max_retries=10
+    Create Session  wait-until-up  ${HTTP_LOCAL_SERVER}  retries=10
     Get On Session  wait-until-up  /
 
 Teardown Flask Http Server And Sessions

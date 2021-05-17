@@ -12,7 +12,7 @@ Suite Teardown  Teardown Flask Http Server And Sessions
 
 Put Request With Streaming Upload
     [Tags]  put
-    Create Session  http_server  ${HTTP_LOCAL_SERVER}  http2=False
+    Create Session  http_server  ${HTTP_LOCAL_SERVER}  http2=${False}
     ${handle}  Get File For Streaming Upload  ${CURDIR}${/}randombytes.bin
     ${headers}  Create Dictionary  Content-Type=application/octet-stream   Accept=application/octet-stream
     ${resp}  Put On Session  http_server  /anything  data=${handle}  headers=&{headers}
@@ -22,7 +22,7 @@ Put Request With Streaming Upload
 
 Patch Request With Streaming Upload
     [Tags]  patch
-    Create Session  http_server  ${HTTP_LOCAL_SERVER}  http2=False
+    Create Session  http_server  ${HTTP_LOCAL_SERVER}  http2=${False}
     ${handle}  Get File For Streaming Upload  ${CURDIR}${/}randombytes.bin
     ${headers}  Create Dictionary  Content-Type=application/octet-stream   Accept=application/octet-stream
     ${resp}  Patch On Session  http_server  /anything  data=${handle}  headers=&{headers}
@@ -32,7 +32,7 @@ Patch Request With Streaming Upload
 
 Post Request With Streaming Upload
     [Tags]  post
-    Create Session  http_server  ${HTTP_LOCAL_SERVER}  http2=False
+    Create Session  http_server  ${HTTP_LOCAL_SERVER}  http2=${False}
     ${handle}  Get File For Streaming Upload  ${CURDIR}${/}randombytes.bin
     ${headers}  Create Dictionary  Content-Type=application/octet-stream   Accept=application/octet-stream
     ${resp}  Post On Session  http_server  /anything  data=${handle}  headers=&{headers}

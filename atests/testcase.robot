@@ -39,7 +39,7 @@ Readme Test
 Get Requests
     [Tags]  get    skip
     Create Session  google  http://www.google.com    http2=False
-    Create Session  github  https://api.github.com   verify=${CURDIR}${/}cacert.pem    http2=False
+    Create Session  github  https://api.github.com   verify=${CURDIR}${/}cacert.pem    http2=${False}
     ${resp}  Get On Session  google  /
     Should Be Equal As Strings  ${resp.status_code}  200
     ${resp}  Get On Session  github  /users/bulkan
@@ -87,7 +87,7 @@ Get With Custom Auth
 Get With Digest Auth
     [Tags]    get   get-cert
     ${auth}    Create List    user    pass
-    Create Digest Session    httpbin    https://httpbin.org    auth=${auth}    debug=3   verify=${CURDIR}${/}cacert.pem    http2=False
+    Create Digest Session    httpbin    https://httpbin.org    auth=${auth}    debug=3   verify=${CURDIR}${/}cacert.pem    http2=${False}
     ${resp}    Get On Session    httpbin    /digest-auth/auth/user/pass
     Should Be Equal As Strings    ${resp.status_code}    200
     Should Be Equal As Strings    ${resp.json()['authenticated']}    True
@@ -223,7 +223,7 @@ Post Request With File
 
 Post Request With Data and File
     [Tags]    post
-    Create Session    httpbin    http://httpbin.org    http2=False
+    Create Session    httpbin    http://httpbin.org    http2=${False}
     &{data}    Create Dictionary    name=mallikarjunarao    surname=kosuri
     Create File    foobar.txt    content=foobar
     ${file_data}    Get File    foobar.txt
@@ -233,7 +233,7 @@ Post Request With Data and File
 
 Put Requests
     [Tags]  put
-    Create Session  httpbin  http://httpbin.org    http2=False
+    Create Session  httpbin  http://httpbin.org    http2=${False}
     &{data}  Create Dictionary  name=bulkan  surname=evcimen
     &{headers}  Create Dictionary  Content-Type=application/x-www-form-urlencoded
     ${resp}  Put On Session  httpbin  /put  data=${data}  headers=${headers}
@@ -242,34 +242,34 @@ Put Requests
 
 Head Request
     [Tags]  head
-    Create Session  httpbin  http://httpbin.org    http2=False
+    Create Session  httpbin  http://httpbin.org    http2=${False}
     ${resp}  Head On Session  httpbin  /headers
     Should Be Equal As Strings  ${resp.status_code}  200
 
 Options Request
     [Tags]  options
-    Create Session  httpbin  http://httpbin.org    http2=False
+    Create Session  httpbin  http://httpbin.org    http2=${False}
     ${resp}  Options On Session  httpbin  /headers
     Should Be Equal As Strings  ${resp.status_code}  200
     Dictionary Should Contain Key  ${resp.headers}  allow
 
 Delete Request With URL Params
     [Tags]  delete
-    Create Session  httpbin  http://httpbin.org    http2=False
+    Create Session  httpbin  http://httpbin.org    http2=${False}
     &{params}   Create Dictionary   key=value     key2=value2
     ${resp}  Delete On Session  httpbin  /delete		params=${params}
     Should Be Equal As Strings  ${resp.status_code}  200
 
 Delete Request With No Data
     [Tags]  delete
-    Create Session  httpbin  http://httpbin.org    http2=False
+    Create Session  httpbin  http://httpbin.org    http2=${False}
     ${resp}  Delete On Session  httpbin  /delete
     Should Be Equal As Strings  ${resp.status_code}  200
 
 
 Patch Requests
     [Tags]    patch
-    Create Session    httpbin    http://httpbin.org    http2=False
+    Create Session    httpbin    http://httpbin.org    http2=${False}
     &{data}    Create Dictionary    name=bulkan    surname=evcimen
     &{headers}    Create Dictionary    Content-Type=application/x-www-form-urlencoded
     ${resp}    Patch On Session    httpbin    /patch    data=${data}    headers=${headers}
@@ -278,7 +278,7 @@ Patch Requests
 
 Patch Requests with Json Data
     [Tags]  patch
-    Create Session  httpbin     http://httpbin.org    http2=False
+    Create Session  httpbin     http://httpbin.org    http2=${False}
     &{data}    Create Dictionary   latitude=30.496346  longitude=-87.640356
     ${resp}     Patch On Session  httpbin  /patch    json=${data}
     Should Be Equal As Strings  ${resp.status_code}  200
@@ -287,7 +287,7 @@ Patch Requests with Json Data
 
 Create a session and make sure it exists
     [Tags]    session
-    Create Session     existing_session  ${HTTP_LOCAL_SERVER}    http2=False
+    Create Session     existing_session  ${HTTP_LOCAL_SERVER}    http2=${False}
     ${exists}         Session Exists    existing_session
     Should Be True     ${exists}
 
