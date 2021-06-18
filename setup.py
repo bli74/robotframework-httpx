@@ -56,7 +56,7 @@ setup(name='robotframework-httpx',
       packages=['HttpxLibrary'],
       install_requires=[
           'robotframework',
-          'httpx[http2]@git+https://github.com/encode/httpx',
+          'httpx[http2]>=0.18.2',
           'requests'
       ],
       extras_require={
