@@ -645,7 +645,11 @@ class SessionKeywords(HttpxKeywords):
 
         ``alias`` that has been used to identify the Session object in the cache
         """
-        return alias in self._cache
+        try:
+            self._cache[alias]
+            return True
+        except RuntimeError:
+            return False
 
     @keyword("Delete All Sessions")
     def delete_all_sessions(self):
