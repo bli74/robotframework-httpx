@@ -3,7 +3,7 @@ from HttpxLibrary.HttpxKeywords import HttpxKeywords
 from HttpxLibrary.SessionKeywords import SessionKeywords
 
 
-class TestHttpxLibraryInheritance():
+class TestHttpxLibraryInheritance:
 
     @classmethod
     def setup_class(cls):

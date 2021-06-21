@@ -55,9 +55,7 @@ def test_log_request(mocked_logger):
     log_request(response)
     assert mocked_logger.info.call_args[0][0] == ("%s Request : " % request.method +
                                                   "url=%s \n " % request.url +
-                                                  #                                                  "path_url=%s \n " % request.path_url +
                                                   "headers=%s \n " % request.headers)
-    # "body=%s \n " % request.body)
 
 
 @mock.patch('HttpxLibrary.log.logger')

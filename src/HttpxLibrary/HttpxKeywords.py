@@ -65,6 +65,7 @@ class HttpxKeywords(object):
         """
         return open(path, 'rb')
 
+    @staticmethod
     @abstractmethod
     def _check_status(expected_status, resp, msg=None):
         """

@@ -111,7 +111,8 @@ def get_files():
 
     for k, v in request.files.items():
         content_type = request.files[k].content_type or 'application/octet-stream'
-        val = json_safe(v.read(), content_type)
+        val = json_safe(v.stream.read(), content_type)
+
         if files.get(k):
             if not isinstance(files[k], list):
                 files[k] = [files[k]]
@@ -151,18 +152,18 @@ def semiflatten(multi):
         return multi
 
 
-def get_url(request):
+def get_url(p_request):
     """
     Since we might be hosted behind a proxy, we need to check the
     X-Forwarded-Proto, X-Forwarded-Protocol, or X-Forwarded-SSL headers
     to find out what protocol was used to access us.
     """
-    protocol = request.headers.get('X-Forwarded-Proto') or request.headers.get('X-Forwarded-Protocol')
-    if protocol is None and request.headers.get('X-Forwarded-Ssl') == 'on':
+    protocol = p_request.headers.get('X-Forwarded-Proto') or p_request.headers.get('X-Forwarded-Protocol')
+    if protocol is None and p_request.headers.get('X-Forwarded-Ssl') == 'on':
         protocol = 'https'
     if protocol is None:
-        return request.url
-    url = list(urlparse(request.url))
+        return p_request.url
+    url = list(urlparse(p_request.url))
     url[0] = protocol
     return urlunparse(url)
 
@@ -265,7 +266,7 @@ def check_basic_auth(user, passwd):
 # qop is a quality of protection
 
 
-def H(data, algorithm):
+def h(data, algorithm):
     if algorithm == 'SHA-256':
         return sha256(data).hexdigest()
     elif algorithm == 'SHA-512':
@@ -274,80 +275,80 @@ def H(data, algorithm):
         return md5(data).hexdigest()
 
 
-def HA1(realm, username, password, algorithm):
-    """Create HA1 hash by realm, username, password
+def ha1(realm, username, password, algorithm):
+    """Create ha1 hash by realm, username, password
 
-    HA1 = md5(A1) = MD5(username:realm:password)
+    ha1 = md5(A1) = MD5(username:realm:password)
     """
     if not realm:
         realm = u''
-    return H(b":".join([username.encode('utf-8'),
+    return h(b":".join([username.encode('utf-8'),
                         realm.encode('utf-8'),
                         password.encode('utf-8')]), algorithm)
 
 
-def HA2(credentials, request, algorithm):
-    """Create HA2 md5 hash
+def ha2(credentials, p_request, algorithm):
+    """Create ha2 md5 hash
 
-    If the qop directive's value is "auth" or is unspecified, then HA2:
-        HA2 = md5(A2) = MD5(method:digestURI)
-    If the qop directive's value is "auth-int" , then HA2 is
-        HA2 = md5(A2) = MD5(method:digestURI:MD5(entityBody))
+    If the qop directive's value is "auth" or is unspecified, then ha2:
+        ha2 = md5(a2) = MD5(method:digestURI)
+    If the qop directive's value is "auth-int" , then ha2 is
+        ha2 = md5(a2) = MD5(method:digestURI:MD5(entityBody))
     """
     if credentials.get("qop") == "auth" or credentials.get('qop') is None:
-        return H(b":".join([request['method'].encode('utf-8'), request['uri'].encode('utf-8')]), algorithm)
+        return h(b":".join([p_request['method'].encode('utf-8'), p_request['uri'].encode('utf-8')]), algorithm)
     elif credentials.get("qop") == "auth-int":
         for k in 'method', 'uri', 'body':
-            if k not in request:
+            if k not in p_request:
                 raise ValueError("%s required" % k)
-        A2 = b":".join([request['method'].encode('utf-8'),
-                        request['uri'].encode('utf-8'),
-                        H(request['body'], algorithm).encode('utf-8')])
-        return H(A2, algorithm)
+        _a2 = b":".join([p_request['method'].encode('utf-8'),
+                         p_request['uri'].encode('utf-8'),
+                         h(p_request['body'], algorithm).encode('utf-8')])
+        return h(_a2, algorithm)
     raise ValueError
 
 
-def response(credentials, password, request):
+def response(credentials, password, p_request):
     """Compile digest auth response
 
     If the qop directive's value is "auth" or "auth-int" , then compute the response as follows:
-       RESPONSE = MD5(HA1:nonce:nonceCount:clienNonce:qop:HA2)
+       RESPONSE = MD5(ha1:nonce:nonceCount:clienNonce:qop:ha2)
     Else if the qop directive is unspecified, then compute the response as follows:
-       RESPONSE = MD5(HA1:nonce:HA2)
+       RESPONSE = MD5(ha1:nonce:ha2)
 
     Arguments:
     - `credentials`: credentials dict
     - `password`: request user password
     - `request`: request dict
     """
-    algorithm = credentials.get('algorithm')
-    HA1_value = HA1(
+    _algorithm = credentials.get('algorithm')
+    _ha1_value = ha1(
         credentials.get('realm'),
         credentials.get('username'),
         password,
-        algorithm
+        _algorithm
     )
-    HA2_value = HA2(credentials, request, algorithm)
+    _ha2_value = ha2(credentials, p_request, _algorithm)
     if credentials.get('qop') is None:
-        response = H(b":".join([
-            HA1_value.encode('utf-8'),
+        _response = h(b":".join([
+            _ha1_value.encode('utf-8'),
             credentials.get('nonce', '').encode('utf-8'),
-            HA2_value.encode('utf-8')
-        ]), algorithm)
+            _ha2_value.encode('utf-8')
+        ]), _algorithm)
     elif credentials.get('qop') == 'auth' or credentials.get('qop') == 'auth-int':
         for k in 'nonce', 'nc', 'cnonce', 'qop':
             if k not in credentials:
                 raise ValueError("%s required for response H" % k)
-        response = H(b":".join([HA1_value.encode('utf-8'),
-                                credentials.get('nonce').encode('utf-8'),
-                                credentials.get('nc').encode('utf-8'),
-                                credentials.get('cnonce').encode('utf-8'),
-                                credentials.get('qop').encode('utf-8'),
-                                HA2_value.encode('utf-8')]), algorithm)
+        _response = h(b":".join([_ha1_value.encode('utf-8'),
+                                 credentials.get('nonce').encode('utf-8'),
+                                 credentials.get('nc').encode('utf-8'),
+                                 credentials.get('cnonce').encode('utf-8'),
+                                 credentials.get('qop').encode('utf-8'),
+                                 _ha2_value.encode('utf-8')]), _algorithm)
     else:
         raise ValueError("qop value are wrong")
 
-    return response
+    return _response
 
 
 # noinspection PyUnusedLocal
@@ -360,7 +361,7 @@ def check_digest_auth(user, passwd):
             return
         request_uri = request.script_root + request.path
         if request.query_string:
-            request_uri += '?' + request.query_string
+            request_uri += '?' + str(request.query_string)
         response_hash = response(credentials, passwd, dict(uri=request_uri,
                                                            body=request.data,
                                                            method=request.method))
@@ -403,13 +404,13 @@ def __parse_request_range(range_header_text):
 
     try:
         right = int(components[1])
-    except:
-        pass
+    except ValueError:
+        right = 0
 
     try:
         left = int(components[0])
-    except:
-        pass
+    except ValueError:
+        left = 0
 
     return left, right
 
@@ -454,25 +455,25 @@ def next_stale_after_value(stale_after):
 
 
 def digest_challenge_response(app, qop, algorithm, stale=False):
-    response = app.make_response('')
-    response.status_code = 401
+    _response = app.make_response('')
+    _response.status_code = 401
 
     # RFC2616 Section4.2: HTTP headers are ASCII.  That means
     # request.remote_addr was originally ASCII, so I should be able to
     # encode it back to ascii.  Also, RFC2617 says about nonces: "The
     # contents of the nonce are implementation dependent"
-    nonce = H(b''.join([
+    nonce = h(b''.join([
         getattr(request, 'remote_addr', u'').encode('ascii'),
         b':',
         str(time.time()).encode('ascii'),
         b':',
         os.urandom(10)
     ]), algorithm)
-    opaque = H(os.urandom(10), algorithm)
+    opaque = h(os.urandom(10), algorithm)
 
     auth = WWWAuthenticate("digest")
     auth.set_digest('me@kennethreitz.com', nonce, opaque=opaque,
                     qop=('auth', 'auth-int') if qop is None else (qop,), algorithm=algorithm)
     auth.stale = stale
-    response.headers['WWW-Authenticate'] = auth.to_header()
-    return response
+    _response.headers['WWW-Authenticate'] = auth.to_header()
+    return _response

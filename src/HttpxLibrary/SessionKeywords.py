@@ -10,12 +10,13 @@ from robot.api.deco import keyword
 from robot.utils.asserts import assert_equal
 
 from HttpxLibrary import utils, log
-from HttpxLibrary.compat import httplib, PY3
+from HttpxLibrary.compat import httplib
 from HttpxLibrary.exceptions import InvalidResponse, InvalidExpectedStatus
 from HttpxLibrary.utils import is_file_descriptor, is_string_type
 from .HttpxKeywords import HttpxKeywords
 
 try:
+    # noinspection PyUnresolvedReferences
     from httpx_ntlm import HttpNtlmAuth
 except ImportError:
     pass
@@ -644,11 +645,7 @@ class SessionKeywords(HttpxKeywords):
 
         ``alias`` that has been used to identify the Session object in the cache
         """
-        try:
-            self._cache[alias]
-            return True
-        except RuntimeError:
-            return False
+        return alias in self._cache
 
     @keyword("Delete All Sessions")
     def delete_all_sessions(self):
@@ -734,8 +731,9 @@ class SessionKeywords(HttpxKeywords):
         return url
 
     # FIXME might be broken we need a test for this
-    def _get_timeout(self, timeout):
-        return float(timeout) if timeout is not None else self.timeout
+    @staticmethod
+    def _get_timeout(timeout):
+        return float(timeout) if timeout is not None else DEFAULT_TIMEOUT_CONFIG
 
     def _capture_output(self):
         if self.debug >= 1:
@@ -745,20 +743,12 @@ class SessionKeywords(HttpxKeywords):
     def _print_debug(self):
         if self.debug >= 1:
             sys.stdout = sys.__stdout__  # Restore stdout
-            if PY3:
-                debug_info = ''.join(
-                    self.http_log.content).replace(
-                    '\\r',
-                    '').replace(
-                    '\'',
-                    '')
-            else:
-                debug_info = ''.join(
-                    self.http_log.content).replace(
-                    '\\r',
-                    '').decode('string_escape').replace(
-                    '\'',
-                    '')
+            debug_info = ''.join(
+                self.http_log.content).replace(
+                '\\r',
+                '').replace(
+                '\'',
+                '')
 
             # Remove empty lines
             debug_info = "\n".join(

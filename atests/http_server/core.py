@@ -185,9 +185,9 @@ def redirect_to():
     response = app.make_response("")
     response.status_code = 302
     if "status_code" in args:
-        status_code = int(args["status_code"])
-        if 300 <= status_code < 400:
-            response.status_code = status_code
+        _status_code = int(args["status_code"])
+        if 300 <= _status_code < 400:
+            response.status_code = _status_code
     response.headers["Location"] = args["url"].encode("utf-8")
 
     return response

@@ -119,7 +119,7 @@ def format_data_according_to_header(session, data, headers):
                     data = json.dumps(data)
         elif headers['Content-Type'].find("application/x-www-form-urlencoded") != -1:
             data = utf8_urlencode(data)
-    else:
+    elif data is not None:
         data = utf8_urlencode(data)
 
     return data
