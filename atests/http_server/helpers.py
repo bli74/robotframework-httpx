@@ -7,21 +7,19 @@ httpbin.helpers
 This module provides helper functions for httpbin.
 """
 
-import json
 import base64
+import json
+import os
 import re
 import time
-import os
 from hashlib import md5, sha256, sha512
-from werkzeug.http import parse_authorization_header
-from werkzeug.datastructures import WWWAuthenticate
 
 from flask import request, make_response
 from six.moves.urllib.parse import urlparse, urlunparse
-
+from werkzeug.datastructures import WWWAuthenticate
+from werkzeug.http import parse_authorization_header
 
 from .structures import CaseInsensitiveDict
-
 
 ASCII_ART = r"""
     -=[ teapot ]=-
@@ -225,9 +223,9 @@ def status_code(code):
             }
         ),
         406: dict(data=json.dumps({
-                'message': 'Client did not request a supported media type.',
-                'accept': ACCEPTED_MEDIA_TYPES
-            }),
+            'message': 'Client did not request a supported media type.',
+            'accept': ACCEPTED_MEDIA_TYPES
+        }),
             headers={
                 'Content-Type': 'application/json'
             }),
@@ -284,8 +282,8 @@ def HA1(realm, username, password, algorithm):
     if not realm:
         realm = u''
     return H(b":".join([username.encode('utf-8'),
-                       realm.encode('utf-8'),
-                       password.encode('utf-8')]), algorithm)
+                        realm.encode('utf-8'),
+                        password.encode('utf-8')]), algorithm)
 
 
 def HA2(credentials, request, algorithm):
@@ -342,11 +340,11 @@ def response(credentials, password, request):
             if k not in credentials:
                 raise ValueError("%s required for response H" % k)
         response = H(b":".join([HA1_value.encode('utf-8'),
-                               credentials.get('nonce').encode('utf-8'),
-                               credentials.get('nc').encode('utf-8'),
-                               credentials.get('cnonce').encode('utf-8'),
-                               credentials.get('qop').encode('utf-8'),
-                               HA2_value.encode('utf-8')]), algorithm)
+                                credentials.get('nonce').encode('utf-8'),
+                                credentials.get('nc').encode('utf-8'),
+                                credentials.get('cnonce').encode('utf-8'),
+                                credentials.get('qop').encode('utf-8'),
+                                HA2_value.encode('utf-8')]), algorithm)
     else:
         raise ValueError("qop value are wrong")
 

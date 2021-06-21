@@ -75,7 +75,7 @@ def json_pretty_print(content):
 def is_string_type(data):
     if PY3 and isinstance(data, str):
         return True
-    if not PY3 and isinstance(data, unicode): # noqa
+    if not PY3 and isinstance(data, unicode):  # noqa
         return True
     return False
 
@@ -83,7 +83,7 @@ def is_string_type(data):
 def is_file_descriptor(fd):
     if PY3 and isinstance(fd, io.IOBase):
         return True
-    if not PY3 and isinstance(fd, file): # noqa
+    if not PY3 and isinstance(fd, file):  # noqa
         return True
     return False
 
@@ -135,6 +135,7 @@ def warn_if_equal_symbol_in_url(func):
                             " or use '/your-url/foo  params=param=a' or escape it")
 
         return func(*args, **kwargs)
+
     decorator.__name__ = func.__name__
     decorator.__doc__ = func.__doc__
     return decorator

@@ -2,9 +2,8 @@ import os
 import ssl
 
 from HttpxLibrary import HttpxLibrary
-from utests import mock
-
 from utests import SCRIPT_DIR
+from utests import mock
 
 
 def build_mocked_session_common_request(alias='alias', url='http://mocking.rules',
@@ -63,9 +62,8 @@ def test_common_request_with_cookies_override_default():
     m_common_request('get', session, '/', cookies={'a': 3, 'b': 4})
     session.get.assert_called_with('http://mocking.rules/', cookies={'a': 3, 'b': 4})
 
-
 # ToDo: Fix for httpx
-#def test_common_request_with_cookies_default_only():
+# def test_common_request_with_cookies_default_only():
 #    session, m_common_request = build_mocked_session_common_request(cookies={'a': 1, 'b': 2})
 #    m_common_request('get', session, '/')
 #    session.get.assert_called_with('http://mocking.rules/', cookies={'a': 1, 'b': 2})

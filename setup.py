@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import io
 import sys
 from os.path import abspath, dirname, join
 

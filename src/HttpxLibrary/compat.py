@@ -1,7 +1,8 @@
 import sys
+
 from requests.compat import OrderedDict  # noqa
-from requests.structures import CaseInsensitiveDict  # noqa
 from requests.sessions import merge_cookies, merge_setting  # noqa
+from requests.structures import CaseInsensitiveDict  # noqa
 
 PY3 = sys.version_info > (3,)
 

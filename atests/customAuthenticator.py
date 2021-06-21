@@ -1,4 +1,6 @@
 from requests.auth import HTTPBasicAuth
+
+
 # Example of a keyword that a test author would supply in order to use the
 # `Create Custom Session` keyword.  Such a keyword can return any subclass
 # of `AuthBase`.

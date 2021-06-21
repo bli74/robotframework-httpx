@@ -61,7 +61,7 @@ class SessionKeywords(HttpxKeywords):
                     f'- timeout={timeout}'
                     f'- verify={verify}'
 
-        )
+                    )
 
         transport = None
         # Retries parameter not supported directly by Client()
@@ -580,7 +580,7 @@ class SessionKeywords(HttpxKeywords):
                                  ' - expected 3, got {}'.format(len(auth)))
         else:
             auth = HttpNtlmAuth('{}\\{}'.format(auth[0], auth[1]),
-                                          auth[2])
+                                auth[2])
             logger.info('Creating NTLM Session')
 
         return self._create_session(

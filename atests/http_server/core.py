@@ -3,10 +3,9 @@
 
 from flask import Flask, Response, jsonify as flask_jsonify, request
 
-from .structures import CaseInsensitiveDict
 from .helpers import get_dict, status_code
+from .structures import CaseInsensitiveDict
 from .utils import weighted_choice
-
 
 app = Flask(__name__)
 

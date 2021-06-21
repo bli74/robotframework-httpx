@@ -1,5 +1,5 @@
-from robot.api.deco import keyword
 from robot.api import logger
+from robot.api.deco import keyword
 
 from HttpxLibrary.utils import warn_if_equal_symbol_in_url
 from .SessionKeywords import SessionKeywords
@@ -54,7 +54,8 @@ class HttpxOnSessionKeywords(SessionKeywords):
             if parameter_key in supported_parameters:
                 local_args[parameter_key] = kwargs.get(parameter_key)
             else:
-                logger.warn('Method get_on_session(): Unsupported dictionary entry for GET request %s dropped.' % parameter_key)
+                logger.warn(
+                    'Method get_on_session(): Unsupported dictionary entry for GET request %s dropped.' % parameter_key)
         response = self._common_request("get", session, url,
                                         params=params, **local_args)
         self._check_status(expected_status, response, msg)

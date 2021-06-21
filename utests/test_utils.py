@@ -1,11 +1,10 @@
 import os
 
-import pytest
 import httpx
-from httpx import _client
+import pytest
 
 from HttpxLibrary import HttpxLibrary
-from HttpxLibrary.utils import is_file_descriptor, merge_headers, warn_if_equal_symbol_in_url
+from HttpxLibrary.utils import is_file_descriptor, merge_headers
 from utests import SCRIPT_DIR
 from utests import mock
 
