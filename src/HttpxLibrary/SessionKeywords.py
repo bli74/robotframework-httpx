@@ -3,6 +3,7 @@ import sys
 
 import httpx
 from httpx import Client, HTTPTransport, Response
+# noinspection PyProtectedMember
 from httpx._config import DEFAULT_LIMITS, DEFAULT_MAX_REDIRECTS, DEFAULT_TIMEOUT_CONFIG
 from robot.api import logger
 from robot.api.deco import keyword
@@ -31,20 +32,26 @@ class SessionKeywords(HttpxKeywords):
             # optional named args
             auth=None,
             cert=None,
-            cookies={},
+            cookies=None,
             debug=0,
             disable_warnings=0,
-            headers={},
+            headers=None,
             http1=True,
             http2=False,
             limits=DEFAULT_LIMITS,
             max_redirects=DEFAULT_MAX_REDIRECTS,
-            params={},
+            params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
             verify=False
     ) -> httpx.Client:
 
+        if params is None:
+            params = {}
+        if headers is None:
+            headers = {}
+        if cookies is None:
+            cookies = {}
         logger.info('Create Session parameters:'
                     f'- alias={alias}'
                     f'- url={url}'
@@ -119,15 +126,15 @@ class SessionKeywords(HttpxKeywords):
             # optional named args
             auth=None,
             cert=None,
-            cookies={},
+            cookies=None,
             debug=0,
             disable_warnings=0,
-            headers={},
+            headers=None,
             http1=True,
             http2=False,
             limits=DEFAULT_LIMITS,
             max_redirects=DEFAULT_MAX_REDIRECTS,
-            params={},
+            params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
             verify=False
@@ -187,6 +194,12 @@ class SessionKeywords(HttpxKeywords):
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
         """
+        if params is None:
+            params = {}
+        if headers is None:
+            headers = {}
+        if cookies is None:
+            cookies = {}
         if auth is not None:
             auth = httpx.BasicAuth(*auth)
 
@@ -220,13 +233,13 @@ class SessionKeywords(HttpxKeywords):
             # optional named args
             auth=None,
             cert=None,
-            cookies={},
+            cookies=None,
             debug=0,
             disable_warnings=0,
-            headers={},
+            headers=None,
             limits=DEFAULT_LIMITS,
             max_redirects=DEFAULT_MAX_REDIRECTS,
-            params={},
+            params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
             verify=False):
@@ -279,6 +292,12 @@ class SessionKeywords(HttpxKeywords):
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
         """
+        if cookies is None:
+            cookies = {}
+        if headers is None:
+            headers = {}
+        if params is None:
+            params = {}
         if auth is not None:
             auth = httpx.BasicAuth(*auth)
 
@@ -312,15 +331,15 @@ class SessionKeywords(HttpxKeywords):
             # optional named args
             auth=None,
             cert=None,
-            cookies={},
+            cookies=None,
             debug=0,
             disable_warnings=0,
-            headers={},
+            headers=None,
             http1=True,
             http2=False,
             limits=DEFAULT_LIMITS,
             max_redirects=DEFAULT_MAX_REDIRECTS,
-            params={},
+            params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
             verify=False):
@@ -378,6 +397,12 @@ class SessionKeywords(HttpxKeywords):
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
         """
+        if cookies is None:
+            cookies = {}
+        if headers is None:
+            headers = {}
+        if params is None:
+            params = {}
         logger.info('Creating Custom Authenticated Session')
         return self._create_session(
             alias=alias,
@@ -406,15 +431,15 @@ class SessionKeywords(HttpxKeywords):
             # optional named args
             auth=None,
             cert=None,
-            cookies={},
+            cookies=None,
             debug=0,
             disable_warnings=0,
-            headers={},
+            headers=None,
             http1=True,
             http2=False,
             limits=DEFAULT_LIMITS,
             max_redirects=DEFAULT_MAX_REDIRECTS,
-            params={},
+            params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
             verify=False):
@@ -473,6 +498,12 @@ class SessionKeywords(HttpxKeywords):
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
         """
+        if cookies is None:
+            cookies = {}
+        if headers is None:
+            headers = {}
+        if params is None:
+            params = {}
         if auth is not None:
             auth = httpx.DigestAuth(*auth)
 
@@ -505,15 +536,15 @@ class SessionKeywords(HttpxKeywords):
             # optional named args
             auth=None,
             cert=None,
-            cookies={},
+            cookies=None,
             debug=0,
             disable_warnings=0,
-            headers={},
+            headers=None,
             http1=True,
             http2=False,
             limits=DEFAULT_LIMITS,
             max_redirects=DEFAULT_MAX_REDIRECTS,
-            params={},
+            params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
             verify=False):
@@ -571,6 +602,12 @@ class SessionKeywords(HttpxKeywords):
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
         """
+        if cookies is None:
+            cookies = {}
+        if headers is None:
+            headers = {}
+        if params is None:
+            params = {}
         try:
             HttpNtlmAuth
         except NameError:

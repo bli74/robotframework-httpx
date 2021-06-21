@@ -7,11 +7,14 @@ from utests import mock
 
 
 def build_mocked_session_common_request(alias='alias', url='http://mocking.rules',
-                                        verify=None, cookies={}):
+                                        verify=None, cookies=None):
+    if cookies is None:
+        cookies = {}
     keywords = HttpxLibrary()
     session = keywords.create_session(alias, url, verify=verify, cookies=cookies)
     # this prevents a real network call from being executed
     session.get = mock.MagicMock()
+    # noinspection PyProtectedMember
     return session, keywords._common_request
 
 

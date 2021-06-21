@@ -320,7 +320,6 @@ def response(credentials, password, request):
     - `password`: request user password
     - `request`: request dict
     """
-    response = None
     algorithm = credentials.get('algorithm')
     HA1_value = HA1(
         credentials.get('realm'),
@@ -351,6 +350,7 @@ def response(credentials, password, request):
     return response
 
 
+# noinspection PyUnusedLocal
 def check_digest_auth(user, passwd):
     """Check user authentication using HTTP Digest auth"""
 

@@ -38,6 +38,7 @@ def view_headers():
     return jsonify(get_dict('headers'))
 
 
+# noinspection PyUnusedLocal
 @app.route("/anything", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE"])
 def view_anything(anything=None):
     """Returns anything passed in request data.
@@ -185,7 +186,7 @@ def redirect_to():
     response.status_code = 302
     if "status_code" in args:
         status_code = int(args["status_code"])
-        if status_code >= 300 and status_code < 400:
+        if 300 <= status_code < 400:
             response.status_code = status_code
     response.headers["Location"] = args["url"].encode("utf-8")
 
