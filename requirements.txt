@@ -1,11 +1,13 @@
 httpx[http2]>=0.18.2
 robotframework>=3.2.1
-requests
+requests~=2.25.1
 
 # Tests
-pytest
-flask
-six;      python_version >= '3.0'
+pytest~=6.2.4
+flask~=2.0.1
 coverage
 flake8
-mock;     python_version < '3.0'
+
+Werkzeug~=2.0.1
+six~=1.16.0
+setuptools~=57.0.0
