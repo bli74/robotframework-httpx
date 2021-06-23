@@ -25,8 +25,9 @@ Programming Language :: Python :: 3.9
 Topic :: Software Development :: Testing
 """[1:-1]
 
-TEST_REQUIRE = ['robotframework>=3.2.1', 'pytest', 'flask', 'six', 'coverage', 'flake8'] if PY3 \
-    else ['robotframework>=3.2.1', 'pytest', 'flask', 'coverage', 'flake8', 'mock']
+INSTALL_REQUIRE = ['robotframework>=3.2.2', 'httpx[http2]>=0.18.2', 'requests']
+TEST_REQUIRE    = ['pytest', 'flask', 'six', 'coverage', 'flake8', 'Werkzeug']
+NTLM_REQUIRE    = ['httpx_ntlm']
 
 VERSION = None
 version_file = join(dirname(abspath(__file__)), 'src', 'HttpxLibrary', 'version.py')
@@ -53,11 +54,8 @@ setup(name='robotframework-httpx',
       classifiers=CLASSIFIERS.splitlines(),
       package_dir={'': 'src'},
       packages=['HttpxLibrary'],
-      install_requires=[
-          'robotframework',
-          'httpx[http2]>=0.18.2',
-          'requests'
-      ],
+      install_requires=INSTALL_REQUIRE,
       extras_require={
+          'ntlm': NTLM_REQUIRE,
           'test': TEST_REQUIRE
       })

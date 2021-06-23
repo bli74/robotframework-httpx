@@ -1,13 +1,15 @@
 httpx[http2]>=0.18.2
-robotframework>=3.2.1
+robotframework>=3.2.2
 requests~=2.25.1
 
-# Tests
-pytest~=6.2.4
-flask~=2.0.1
-coverage
-flake8
+# Optional modules to run tests
+pytest;           'test' in extra
+flask;            'test' in extra
+coverage;         'test' in extra
+flake8;           'test' in extra
+six;              'test' in extra
+Werkzeug;         'test' in extra
+setuptools;       'test' in extra
 
-Werkzeug~=2.0.1
-six~=1.16.0
-setuptools~=57.0.0
+# Optional modules to use NTLM authentication
+httpx_ntlm;       'ntlm' in extra

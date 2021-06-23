@@ -64,7 +64,8 @@ Get HTTPS & Verify Cert with a CA bundle
 Get HTTPS with Client Side Certificates
     [Tags]  get     get-cert
     @{client_certs}    Create List     ${CURDIR}${/}clientcert.pem     ${CURDIR}${/}clientkey.pem
-    Create Session  crtsession  https://server.cryptomix.com/secure     cert=@{client_certs}
+    # Create Session  crtsession  https://server.cryptomix.com/secure     cert=@{client_certs}
+    Create Session  crtsession    https://prod.idrix.eu/secure    cert=@{client_certs}
     ${resp}    Get On Session     crtsession  /
     Should Be Equal As Strings  ${resp.status_code}     200
 
