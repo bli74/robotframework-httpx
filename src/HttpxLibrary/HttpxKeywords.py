@@ -3,7 +3,6 @@ from abc import abstractmethod
 import robot
 from robot.api.deco import keyword
 from robot.libraries.BuiltIn import BuiltIn
-from robot.utils.asserts import assert_equal
 
 
 class HttpxKeywords(object):

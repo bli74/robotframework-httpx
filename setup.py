@@ -26,8 +26,8 @@ Topic :: Software Development :: Testing
 """[1:-1]
 
 INSTALL_REQUIRE = ['robotframework>=3.2.2', 'httpx[http2]>=0.18.2', 'requests']
-TEST_REQUIRE    = ['pytest', 'flask', 'six', 'coverage', 'flake8', 'Werkzeug']
-NTLM_REQUIRE    = ['httpx_ntlm']
+TEST_REQUIRE = ['pytest', 'flask', 'six', 'coverage', 'flake8', 'Werkzeug']
+NTLM_REQUIRE = ['httpx_ntlm']
 
 VERSION = None
 version_file = join(dirname(abspath(__file__)), 'src', 'HttpxLibrary', 'version.py')
