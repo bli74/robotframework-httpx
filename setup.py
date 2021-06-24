@@ -54,6 +54,7 @@ setup(name='robotframework-httpx',
       classifiers=CLASSIFIERS.splitlines(),
       package_dir={'': 'src'},
       packages=['HttpxLibrary'],
+      python_requires='>=3.6',
       install_requires=INSTALL_REQUIRE,
       extras_require={
           'ntlm': NTLM_REQUIRE,
