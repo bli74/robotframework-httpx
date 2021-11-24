@@ -227,7 +227,7 @@ Post Request With Data and File
     Create Session    httpbin    http://httpbin.org    http2=${False}
     &{data}    Create Dictionary    name=mallikarjunarao    surname=kosuri
     Create File    foobar.txt    content=foobar
-    ${file_data}    Get File    foobar.txt
+    ${file_data}    Get Binary File    foobar.txt
     &{files}    Create Dictionary    file=${file_data}
     ${resp}    Post On Session    httpbin    /post    files=${files}    data=${data}
     Should Be Equal As Strings    ${resp.status_code}    200

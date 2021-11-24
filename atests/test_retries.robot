@@ -17,12 +17,12 @@ ${HTTP_LOCAL_SERVER}    http://localhost:5000
 Retry Get Request Because Of 502 Error With Default Config
     [Tags]  get  retry
     Create Session  http_server  ${HTTP_LOCAL_SERVER}  http2=${False}
-    Run Keyword And Expect Error  HTTPStatusError: 502 *   Get On Session  http_server  /status/502
+    Run Keyword And Expect Error  HTTPStatusError: *502 *   Get On Session  http_server  /status/502
 
 Retry Get Request Because Of 502 Error With Max Retries 1
     [Tags]  get  retry
     Create Session  http_server  ${HTTP_LOCAL_SERVER}  retries=1  http2=${False}
-    Run Keyword And Expect Error  HTTPStatusError: 502 *   Get On Session  http_server  /status/502
+    Run Keyword And Expect Error  HTTPStatusError: *502 *   Get On Session  http_server  /status/502
 
 Retry Disabled Get Request
     [Tags]  get  retry

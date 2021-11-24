@@ -10,7 +10,7 @@ Post Request With XML File
     [Tags]  post
     Create Session  httpbin  http://httpbin.org    http2=False
 
-    ${file_data}=  Get File  ${CURDIR}${/}test.xml
+    ${file_data}=  Get Binary File  ${CURDIR}${/}test.xml
     ${files}=  Create Dictionary  xml=${file_data}
     ${headers}=  Create Dictionary  Authorization=testing-token
     Log  ${headers}

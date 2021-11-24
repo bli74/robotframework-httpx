@@ -74,12 +74,12 @@ Get Request With Url Params As Array
 
 Get Request And Fail By Default On Http Error
     [Tags]  get
-    Run Keyword And Expect Error  HTTPStatusError: 400*
+    Run Keyword And Expect Error  HTTPStatusError: *400*
     ...                           GET On Session  ${GLOBAL_SESSION}  /status/400
 
 Get Request And Fail By Expecting A 200 Status
     [Tags]  get
-    Run Keyword And Expect Error  HTTPStatusError: 404 Client Error: NOT FOUND for url: http://localhost:5000/status/404*
+    Run Keyword And Expect Error  HTTPStatusError: *404*
     ...                           GET On Session  ${GLOBAL_SESSION}  /status/404
 
 Get Request Expect An Error And Evaluate Response
@@ -185,7 +185,7 @@ Head Request With Header
 
 Head Request And Fail By Default On Http Error
     [Tags]  head
-    Run Keyword And Expect Error  HTTPStatusError: 400*
+    Run Keyword And Expect Error  HTTPStatusError: *400*
     ...                           HEAD On Session  ${GLOBAL_SESSION}  /status/400
 
 Head Request Expect An Error And Evaluate Response

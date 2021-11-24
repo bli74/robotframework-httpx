@@ -47,7 +47,7 @@ Request Should Be Successful
 Request Should Not Be Successful
     [Tags]  get  status
     ${resp}  Get On Session  ${GLOBAL_SESSION}  /status/500  expected_status=500
-    Run Keyword And Expect Error  HTTPStatusError: 500*  Request Should Be Successful  ${resp}
+    Run Keyword And Expect Error  HTTPStatusError: *500 *  Request Should Be Successful  ${resp}
 
 Request And Status Should Be An Invalid Expected Status
     [Tags]  get  status

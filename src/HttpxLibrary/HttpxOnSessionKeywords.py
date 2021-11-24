@@ -48,7 +48,7 @@ class HttpxOnSessionKeywords(SessionKeywords):
         session = self._cache.switch(alias)
 
         # Parameters supported by httpx.Client.get(), 'params' is already handled by name or position
-        supported_parameters = ('headers', 'cookies', 'auth', 'allow_redirects', 'timeout')
+        supported_parameters = ('headers', 'cookies', 'auth', 'follow_redirects', 'timeout')
         local_args = {}
         for parameter_key in kwargs.keys():
             if parameter_key in supported_parameters:
