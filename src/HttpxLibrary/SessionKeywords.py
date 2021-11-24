@@ -53,22 +53,23 @@ class SessionKeywords(HttpxKeywords):
             headers = {}
         if cookies is None:
             cookies = {}
-        logger.info('Create Session parameters:'
-                    f'- alias={alias}'
-                    f'- url={url}'
-                    f'- auth={auth}'
-                    f'- cert={cert}'
-                    f'- cookies={cookies}'
-                    f'- headers={headers}'
-                    f'- http1={http1}'
-                    f'- http2={http2}'
-                    f'- limits={limits}'
-                    f'- max_redirects={max_redirects}'
-                    f'- params={params}'
-                    f'- retries={retries}'
-                    f'- timeout={timeout}'
-                    f'- verify={verify}'
-
+        if isinstance(cert, list):
+            cert=tuple(cert)
+        logger.info('Create Session parameters:\n'
+                    f'- alias={alias}\n'
+                    f'- url={url}\n'
+                    f'- auth={auth}\n'
+                    f'- cert={cert}\n'
+                    f'- cookies={cookies}\n'
+                    f'- headers={headers}\n'
+                    f'- http1={http1}\n'
+                    f'- http2={http2}\n'
+                    f'- limits={limits}\n'
+                    f'- max_redirects={max_redirects}\n'
+                    f'- params={params}\n'
+                    f'- retries={retries}\n'
+                    f'- timeout={timeout}\n'
+                    f'- verify={verify}\n'
                     )
 
         transport = None

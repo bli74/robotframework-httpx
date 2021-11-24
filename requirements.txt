@@ -1,6 +1,7 @@
-httpx[http2]>=0.18.2
+httpx[http2]==0.18.2
 robotframework>=3.2.2
 requests~=2.25.1
+httpcore==0.13.6
 
 # Optional modules to run tests
 pytest;           'test' in extra

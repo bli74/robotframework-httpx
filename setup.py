@@ -25,7 +25,7 @@ Programming Language :: Python :: 3.9
 Topic :: Software Development :: Testing
 """[1:-1]
 
-INSTALL_REQUIRE = ['robotframework>=3.2.2', 'httpx[http2]>=0.18.2', 'requests']
+INSTALL_REQUIRE = ['robotframework>=3.2.2', 'httpx[http2]==0.18.2', 'requests', 'httpcore==0.13.6']
 TEST_REQUIRE = ['pytest', 'flask', 'six', 'coverage', 'flake8', 'Werkzeug']
 NTLM_REQUIRE = ['httpx_ntlm']
 
