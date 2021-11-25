@@ -61,18 +61,17 @@ class HttpxLibrary(HttpxOnSessionKeywords):
         ``${response.text}``. Below the list of the most useful attributes:
 
         | = Attributes = | = Explanation = |
-        | content | Content of the response, in bytes. |
-        | cookies | A CookieJar of Cookies the server sent back. |
-        | elapsed | The amount of time elapsed between sending the request and the arrival of the response (as a timedelta). This property specifically measures the time taken between sending the first byte of the request and finishing parsing the headers. It is therefore unaffected by consuming the response content or the value of the stream keyword argument. |
-        | encoding | Encoding to decode with when accessing ``response.text.`` |
-        | headers | Case-insensitive Dictionary of Response Headers. For example, ``headers['content-encoding']`` will return the value of a `Content-Encoding' response header. |
-        | history | A list of Response objects from the history of the Request. Any redirect responses will end up here. The list is sorted from the oldest to the most recent request. |
-        | json    | Returns the json-encoded content of a response, if any. Parameters:	``**kwargs`` - Optional arguments that json.loads takes. Raises:	ValueError ? If the response body does not contain valid json. |
-        | ok      | Returns True if status_code is less than 400, False if not. |
-        | reason  | Textual reason of responded HTTP Status, e.g. ``Not Found`` or ``OK``. |
-        | status_code | Integer Code of responded HTTP Status, e.g. 404 or 200. |
-        | text    | Content of the response, in unicode. If ``response.encoding`` is ``None``, encoding will be guessed using chardet. The encoding of the response content is determined based solely on HTTP headers, following RFC 2616 to the letter. If you can take advantage of non-HTTP knowledge to make a better guess at the encoding, you should set ``response.encoding`` appropriately before accessing this property. |
-        | url     | Final URL location of Response. |
+        | content        | Content of the response, in bytes. |
+        | cookies        | A CookieJar of Cookies the server sent back. |
+        | elapsed        | The amount of time elapsed between sending the request and the arrival of the response (as a timedelta). This property specifically measures the time taken between sending the first byte of the request and finishing parsing the headers. It is therefore unaffected by consuming the response content or the value of the stream keyword argument. |
+        | encoding       | Encoding to decode with when accessing ``response.text.`` |
+        | headers        | Case-insensitive Dictionary of Response Headers. For example, ``headers['content-encoding']`` will return the value of a `Content-Encoding' response header. |
+        | history        | A list of Response objects from the history of the Request. Any redirect responses will end up here. The list is sorted from the oldest to the most recent request. |
+        | is_success     | Returns True if status_code is less than 400, False if not. |
+        | reason_phrase  | Textual reason of responded HTTP Status, e.g. ``Not Found`` or ``OK``. |
+        | status_code    | Integer Code of responded HTTP Status, e.g. 404 or 200. |
+        | text           | Content of the response, in unicode. If ``response.encoding`` is ``None``, encoding will be guessed using chardet. The encoding of the response content is determined based solely on HTTP headers, following RFC 2616 to the letter. If you can take advantage of non-HTTP knowledge to make a better guess at the encoding, you should set ``response.encoding`` appropriately before accessing this property. |
+        | url            | Final URL location of Response. |
         """
     __version__ = VERSION
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'

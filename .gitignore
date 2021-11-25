@@ -11,6 +11,7 @@ output.xml
 debug.txt
 report.html
 foobar.txt
+tests-report/
 
 ~*
 htmlcov
@@ -23,6 +24,7 @@ lib/
 test.py
 bin/
 src/robotframework_httpx.egg-info/
+.vscode/
 
 # ignore virtuvalenv
 venv/*
