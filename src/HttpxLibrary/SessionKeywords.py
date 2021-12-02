@@ -44,7 +44,8 @@ class SessionKeywords(HttpxKeywords):
             params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
-            verify=False
+            verify=False,
+            verify_with_subject=True
     ) -> httpx.Client:
 
         if params is None:
@@ -99,6 +100,13 @@ class SessionKeywords(HttpxKeywords):
             transport=transport
         )
 
+        # Override hardcoded setting of httpx library:
+        # Check hostname also against certificate subject / common name?
+        if verify_with_subject:
+            s._transport._pool._ssl_context.hostname_checks_common_name = True
+        else:
+            s._transport._pool._ssl_context.hostname_checks_common_name = False
+
         # Disable requests warnings, useful when you have large number of testcase
         # you will observe drastical changes in Robot log.html and output.xml files size
         if disable_warnings:
@@ -139,7 +147,8 @@ class SessionKeywords(HttpxKeywords):
             params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
-            verify=False
+            verify=False,
+            verify_with_subject=True
     ):
         """ Create Session: create a HTTP session to a server
 
@@ -195,6 +204,9 @@ class SessionKeywords(HttpxKeywords):
                    of requested hosts. Either `True` (default CA bundle),
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
+        ``verify_with_subject`` Validate server hostname also against certificate subject?
+                                ${True}  - (default) check hostname against subject and alternative hostname list
+                                ${False} - check hostname against alternative hostname list only
         """
         if params is None:
             params = {}
@@ -223,7 +235,8 @@ class SessionKeywords(HttpxKeywords):
             max_redirects=max_redirects,
             debug=debug,
             disable_warnings=disable_warnings,
-            retries=retries
+            retries=retries,
+            verify_with_subject=verify_with_subject
         )
 
     @keyword("Create HTTP2 Session")
@@ -244,7 +257,9 @@ class SessionKeywords(HttpxKeywords):
             params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
-            verify=False):
+            verify=False,
+            verify_with_subject=True
+    ):
         """ Create Session: create a HTTP/2 only session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -293,6 +308,10 @@ class SessionKeywords(HttpxKeywords):
                    of requested hosts. Either `True` (default CA bundle),
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
+
+        ``verify_with_subject`` Validate server hostname also against certificate subject?
+                                ${True}  - (default) check hostname against subject and alternative hostname list
+                                ${False} - check hostname against alternative hostname list only
         """
         if cookies is None:
             cookies = {}
@@ -321,7 +340,8 @@ class SessionKeywords(HttpxKeywords):
             max_redirects=max_redirects,
             debug=debug,
             disable_warnings=disable_warnings,
-            retries=retries
+            retries=retries,
+            verify_with_subject=verify_with_subject
         )
 
     @keyword("Create Custom Session")
@@ -344,7 +364,9 @@ class SessionKeywords(HttpxKeywords):
             params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
-            verify=False):
+            verify=False,
+            verify_with_subject=True
+    ):
         """ Create Session: create a HTTP session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -398,6 +420,10 @@ class SessionKeywords(HttpxKeywords):
                    of requested hosts. Either `True` (default CA bundle),
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
+
+        ``verify_with_subject`` Validate server hostname also against certificate subject?
+                                ${True}  - (default) check hostname against subject and alternative hostname list
+                                ${False} - check hostname against alternative hostname list only
         """
         if cookies is None:
             cookies = {}
@@ -422,7 +448,9 @@ class SessionKeywords(HttpxKeywords):
             max_redirects=max_redirects,
             debug=debug,
             disable_warnings=disable_warnings,
-            retries=retries)
+            retries=retries,
+            verify_with_subject=verify_with_subject
+        )
 
     @keyword("Create Digest Session")
     def create_digest_session(
@@ -444,7 +472,9 @@ class SessionKeywords(HttpxKeywords):
             params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
-            verify=False):
+            verify=False,
+            verify_with_subject=True
+    ):
         """ Create Session: create a HTTP session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -499,6 +529,10 @@ class SessionKeywords(HttpxKeywords):
                    of requested hosts. Either `True` (default CA bundle),
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
+
+        ``verify_with_subject`` Validate server hostname also against certificate subject?
+                                ${True}  - (default) check hostname against subject and alternative hostname list
+                                ${False} - check hostname against alternative hostname list only
         """
         if cookies is None:
             cookies = {}
@@ -527,7 +561,9 @@ class SessionKeywords(HttpxKeywords):
             max_redirects=max_redirects,
             debug=debug,
             disable_warnings=disable_warnings,
-            retries=retries)
+            retries=retries,
+            verify_with_subject=verify_with_subject
+        )
 
     @keyword("Create Ntlm Session")
     def create_ntlm_session(
@@ -549,7 +585,8 @@ class SessionKeywords(HttpxKeywords):
             params=None,
             retries=DEFAULT_RETRIES,
             timeout=DEFAULT_TIMEOUT_CONFIG,
-            verify=False):
+            verify=False,
+            verify_with_subject=True):
         """ Create Session: create a HTTP session to a server
 
         ``alias`` Robot Framework alias to identify the session
@@ -603,6 +640,10 @@ class SessionKeywords(HttpxKeywords):
                    of requested hosts. Either `True` (default CA bundle),
                    a path to an SSL certificate file, or `False` (disable verification).
                    See httpx.Client()
+
+        ``verify_with_subject`` Validate server hostname also against certificate subject?
+                                ${True}  - (default) check hostname against subject and alternative hostname list
+                                ${False} - check hostname against alternative hostname list only
         """
         if cookies is None:
             cookies = {}
@@ -638,7 +679,9 @@ class SessionKeywords(HttpxKeywords):
             max_redirects=max_redirects,
             debug=debug,
             disable_warnings=disable_warnings,
-            retries=retries)
+            retries=retries,
+            verify_with_subject=verify_with_subject
+        )
 
     @keyword("Session Exists")
     def session_exists(self, alias):
