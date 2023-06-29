@@ -1,6 +1,6 @@
 httpx[http2]>=0.18.2
 robotframework>=3.2.2
-requests~=2.25.1
+requests>=2.31.0
 
 
 # Optional modules to run tests
