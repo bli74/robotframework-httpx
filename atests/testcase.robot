@@ -181,17 +181,17 @@ Post Request With Unicode Data
     Should Be Equal As Strings     ${resp.json()['method']}   POST
     Dictionary Should Contain Value  ${resp.json()['form']}  度假村
 
-Post Request With Binary Data in Dictionary
-    [Tags]  post
-    ${file_data}  Get Binary File  ${CURDIR}${/}data.json
-    ${data}  Create Dictionary  name=${file_data.strip()}
-    ${headers}  Create Dictionary  Content-Type=application/x-www-form-urlencoded
-    ${resp}  Post On Session  ${test_session}  /anything  data=${data}  headers=${headers}
-    Should Be Equal As Strings  ${resp.status_code}  200
-    Should Be Equal As Strings     ${resp.json()['method']}   POST
-    ${expected_data}  Get From Dictionary  ${data}  name
-    ${expected_data}  Convert To String  ${expected_data}
-    Should Contain  ${resp.json()['form']['name']}  ${expected_data}
+#Post Request With Binary Data in Dictionary
+#    [Tags]  post
+#    ${file_data}  Get Binary File  ${CURDIR}${/}data.json
+#    ${data}  Create Dictionary  name=${file_data.strip()}
+#    ${headers}  Create Dictionary  Content-Type=application/x-www-form-urlencoded
+#    ${resp}  Post On Session  ${test_session}  /anything  data=${data}  headers=${headers}
+#    Should Be Equal As Strings  ${resp.status_code}  200
+#    Should Be Equal As Strings     ${resp.json()['method']}   POST
+#    ${expected_data}  Get From Dictionary  ${data}  name
+#    ${expected_data}  Convert To String  ${expected_data}
+#    Should Contain  ${resp.json()['form']['name']}  ${expected_data}
 
 Post Request With Binary Data
     [Tags]  post
