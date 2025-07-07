@@ -56,9 +56,9 @@ jobs:
       with:
         flags: acceptance
         file: coverage.xml
-    - name: Archive Robot Framework Tests Report
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: rf-tests-report-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.robot-version }}
-        path: ./tests-report
+#    - name: Archive Robot Framework Tests Report
+#      if: ${{ always() }}
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: rf-tests-report-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.robot-version }}
+#        path: ./tests-report
