@@ -5,11 +5,11 @@ requests>=2.31.0
 
 # Optional modules to run tests
 pytest;           'test' in extra
-flask;            'test' in extra
+flask==2.*;            'test' in extra
 coverage;         'test' in extra
 flake8;           'test' in extra
 six;              'test' in extra
-Werkzeug;         'test' in extra
+Werkzeug==2.*;         'test' in extra
 setuptools;       'test' in extra
 
 # Optional modules to use NTLM authentication
