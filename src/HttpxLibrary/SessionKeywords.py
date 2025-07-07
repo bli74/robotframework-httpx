@@ -14,6 +14,7 @@ from HttpxLibrary.compat import httplib
 from HttpxLibrary.exceptions import InvalidResponse, InvalidExpectedStatus
 from HttpxLibrary.utils import is_file_descriptor, is_string_type
 from .HttpxKeywords import HttpxKeywords
+from .RetryKeywords import RetryKeywords
 
 try:
     # noinspection PyUnresolvedReferences
@@ -22,8 +23,12 @@ except ImportError:
     pass
 
 
-class SessionKeywords(HttpxKeywords):
+class SessionKeywords(HttpxKeywords, RetryKeywords):
     DEFAULT_RETRIES = 3
+
+    def __init__(self):
+        HttpxKeywords.__init__(self)
+        RetryKeywords.__init__(self)
 
     def _create_session(
             self,
@@ -701,6 +706,45 @@ class SessionKeywords(HttpxKeywords):
                 data.close()
 
         return resp
+
+    def _common_request_with_retry(
+            self,
+            method,
+            session,
+            uri,
+            use_retry=True,
+            **kwargs):
+        """
+        Enhanced version of _common_request that supports retry logic
+        """
+        if not use_retry:
+            return self._common_request(method, session, uri, **kwargs)
+        
+        # Get session alias for retry config lookup
+        session_alias = None
+        for alias, cached_session in self._cache._connections.items():
+            if cached_session is session:
+                session_alias = alias
+                break
+        
+        retry_config = self._get_retry_config(session_alias)
+        method_function = getattr(session, method)
+        
+        def request_with_logging():
+            self._capture_output()
+            resp = method_function(self._get_url(session, uri), **kwargs)
+            log.log_request(resp)
+            self._print_debug()
+            session.last_resp = resp
+            log.log_response(resp)
+            
+            data = kwargs.get('data', None)
+            if method == "get" and is_file_descriptor(data):
+                data.close()
+            
+            return resp
+        
+        return self._execute_with_retry(request_with_logging, retry_config)
 
     @staticmethod
     def _check_status(expected_status, resp, msg=None):

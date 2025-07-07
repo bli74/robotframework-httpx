@@ -222,3 +222,147 @@ class HttpxOnSessionKeywords(SessionKeywords):
         response = self._common_request("options", session, url, **kwargs)
         self._check_status(expected_status, response, msg)
         return response
+
+    @warn_if_equal_symbol_in_url
+    @keyword("GET On Session With Retry")
+    def get_on_session_with_retry(self, alias, url, params=None,
+                                 expected_status=None, msg=None, 
+                                 max_retries=None, backoff_factor=None,
+                                 retry_on_status=None, **kwargs):
+        """
+        Sends a GET request on a previously created HTTP Session with enhanced retry logic.
+
+        This keyword extends `GET On Session` with configurable retry parameters.
+        
+        Args:
+            alias: Session alias name
+            url: Request URL
+            params: Query parameters
+            expected_status: Expected HTTP status code
+            msg: Custom error message
+            max_retries: Override max retries for this request
+            backoff_factor: Override backoff factor for this request  
+            retry_on_status: Override retry status codes for this request (comma-separated string)
+            **kwargs: Additional request parameters
+
+        Examples:
+        | ${response}= | GET On Session With Retry | my_session | /api/data |
+        | ${response}= | GET On Session With Retry | my_session | /api/flaky | max_retries=5 |
+        | ${response}= | GET On Session With Retry | my_session | /api/service | retry_on_status=500,503 |
+        """
+        return self.retry_request_on_session(
+            alias, 'GET', url, 
+            params=params,
+            expected_status=expected_status,
+            msg=msg,
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            retry_on_status=retry_on_status,
+            **kwargs
+        )
+
+    @warn_if_equal_symbol_in_url
+    @keyword("POST On Session With Retry")
+    def post_on_session_with_retry(self, alias, url, data=None, json=None,
+                                  expected_status=None, msg=None,
+                                  max_retries=None, backoff_factor=None,
+                                  retry_on_status=None, **kwargs):
+        """
+        Sends a POST request on a previously created HTTP Session with enhanced retry logic.
+
+        This keyword extends `POST On Session` with configurable retry parameters.
+        
+        Args:
+            alias: Session alias name
+            url: Request URL
+            data: Request body data
+            json: JSON request body
+            expected_status: Expected HTTP status code
+            msg: Custom error message
+            max_retries: Override max retries for this request
+            backoff_factor: Override backoff factor for this request
+            retry_on_status: Override retry status codes for this request (comma-separated string)
+            **kwargs: Additional request parameters
+
+        Examples:
+        | ${response}= | POST On Session With Retry | my_session | /api/submit | json=${data} |
+        | ${response}= | POST On Session With Retry | my_session | /api/upload | data=${file_data} | max_retries=3 |
+        """
+        return self.retry_request_on_session(
+            alias, 'POST', url,
+            data=data,
+            json=json,
+            expected_status=expected_status,
+            msg=msg,
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            retry_on_status=retry_on_status,
+            **kwargs
+        )
+
+    @warn_if_equal_symbol_in_url
+    @keyword("PUT On Session With Retry")
+    def put_on_session_with_retry(self, alias, url, data=None, json=None,
+                                 expected_status=None, msg=None,
+                                 max_retries=None, backoff_factor=None,
+                                 retry_on_status=None, **kwargs):
+        """
+        Sends a PUT request on a previously created HTTP Session with enhanced retry logic.
+
+        This keyword extends `PUT On Session` with configurable retry parameters.
+        """
+        return self.retry_request_on_session(
+            alias, 'PUT', url,
+            data=data,
+            json=json,
+            expected_status=expected_status,
+            msg=msg,
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            retry_on_status=retry_on_status,
+            **kwargs
+        )
+
+    @warn_if_equal_symbol_in_url
+    @keyword("PATCH On Session With Retry")
+    def patch_on_session_with_retry(self, alias, url, data=None, json=None,
+                                   expected_status=None, msg=None,
+                                   max_retries=None, backoff_factor=None,
+                                   retry_on_status=None, **kwargs):
+        """
+        Sends a PATCH request on a previously created HTTP Session with enhanced retry logic.
+
+        This keyword extends `PATCH On Session` with configurable retry parameters.
+        """
+        return self.retry_request_on_session(
+            alias, 'PATCH', url,
+            data=data,
+            json=json,
+            expected_status=expected_status,
+            msg=msg,
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            retry_on_status=retry_on_status,
+            **kwargs
+        )
+
+    @warn_if_equal_symbol_in_url
+    @keyword("DELETE On Session With Retry")
+    def delete_on_session_with_retry(self, alias, url,
+                                    expected_status=None, msg=None,
+                                    max_retries=None, backoff_factor=None,
+                                    retry_on_status=None, **kwargs):
+        """
+        Sends a DELETE request on a previously created HTTP Session with enhanced retry logic.
+
+        This keyword extends `DELETE On Session` with configurable retry parameters.
+        """
+        return self.retry_request_on_session(
+            alias, 'DELETE', url,
+            expected_status=expected_status,
+            msg=msg,
+            max_retries=max_retries,
+            backoff_factor=backoff_factor,
+            retry_on_status=retry_on_status,
+            **kwargs
+        )
