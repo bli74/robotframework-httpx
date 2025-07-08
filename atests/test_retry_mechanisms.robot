@@ -19,9 +19,9 @@ Test Global Retry Configuration
     ${config}=    Get Retry Configuration
     Should Be Equal As Integers    ${config}[max_retries]    5
     Should Be Equal As Numbers     ${config}[backoff_factor]    0.5
-    List Should Contain Value    ${config}[retry_on_status]    500
-    List Should Contain Value    ${config}[retry_on_status]    502
-    List Should Contain Value    ${config}[retry_on_status]    503
+    List Should Contain Value    ${config}[retry_on_status]    ${500}
+    List Should Contain Value    ${config}[retry_on_status]    ${502}
+    List Should Contain Value    ${config}[retry_on_status]    ${503}
 
 Test Session Retry Configuration
     [Documentation]    Test setting session-specific retry configuration
