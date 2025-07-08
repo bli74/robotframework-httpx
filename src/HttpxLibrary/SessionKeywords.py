@@ -773,10 +773,11 @@ class SessionKeywords(HttpxKeywords, RetryKeywords):
         """
         Helper method to get the full url
         """
-        url = session.url
+        url = str(session.url)  # Ensure url is string
         if uri:
+            uri = str(uri)  # Ensure uri is string
             slash = '' if uri.startswith('/') else '/'
-            url = "%s%s%s" % (session.url, slash, uri)
+            url = "%s%s%s" % (url, slash, uri)
         return url
 
     # FIXME might be broken we need a test for this

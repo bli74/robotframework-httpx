@@ -70,6 +70,12 @@ class RetryKeywords:
         | Set Global Retry Configuration | max_retries=5 | backoff_factor=0.5 |
         | Set Global Retry Configuration | retry_on_status=500,502,503 | jitter=False |
         """
+        # Convert parameters to correct types (Robot Framework passes everything as strings)
+        max_retries = int(max_retries)
+        backoff_factor = float(backoff_factor)
+        backoff_max = float(backoff_max)
+        jitter = bool(jitter) if isinstance(jitter, bool) else str(jitter).lower() in ('true', '1', 'yes')
+        
         if isinstance(retry_on_status, str):
             retry_on_status = [int(code.strip()) for code in retry_on_status.split(',')]
         
@@ -107,6 +113,12 @@ class RetryKeywords:
         | Set Session Retry Configuration | my_session | max_retries=5 |
         | Set Session Retry Configuration | api_session | retry_on_status=429,503 | backoff_factor=1.0 |
         """
+        # Convert parameters to correct types (Robot Framework passes everything as strings)
+        max_retries = int(max_retries)
+        backoff_factor = float(backoff_factor)
+        backoff_max = float(backoff_max)
+        jitter = bool(jitter) if isinstance(jitter, bool) else str(jitter).lower() in ('true', '1', 'yes')
+        
         if isinstance(retry_on_status, str):
             retry_on_status = [int(code.strip()) for code in retry_on_status.split(',')]
         
@@ -275,13 +287,22 @@ class RetryKeywords:
         """
         session = self._cache.switch(alias)
         
-        # Get base retry config and override if specified
-        retry_config = self._get_retry_config(alias)
+        # Get base retry config and create a copy to avoid modifying the original
+        base_config = self._get_retry_config(alias)
+        retry_config = RetryConfig(
+            max_retries=base_config.max_retries,
+            backoff_factor=base_config.backoff_factor,
+            backoff_max=base_config.backoff_max,
+            retry_on_status=base_config.retry_on_status.copy(),
+            retry_on_exceptions=base_config.retry_on_exceptions.copy(),
+            jitter=base_config.jitter
+        )
         
+        # Override with request-specific parameters (convert types as needed)
         if max_retries is not None:
-            retry_config.max_retries = max_retries
+            retry_config.max_retries = int(max_retries)
         if backoff_factor is not None:
-            retry_config.backoff_factor = backoff_factor
+            retry_config.backoff_factor = float(backoff_factor)
         if retry_on_status is not None:
             if isinstance(retry_on_status, str):
                 retry_config.retry_on_status = [int(code.strip()) for code in retry_on_status.split(',')]
@@ -333,6 +354,12 @@ class RetryKeywords:
         | ${response}= | Wait Until Request Succeeds | my_session | GET | /health |
         | ${response}= | Wait Until Request Succeeds | my_session | GET | /api/ready | timeout=120 | interval=5 |
         """
+        # Convert parameters to correct types (Robot Framework passes everything as strings)
+        timeout = float(timeout)
+        interval = float(interval)
+        if isinstance(expected_status, str) and expected_status.isdigit():
+            expected_status = int(expected_status)
+        
         session = self._cache.switch(alias)
         method_func = getattr(session, method.lower())
         
